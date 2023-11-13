@@ -1,0 +1,33 @@
+version: "3"
+services:
+  backend:
+    container_name: venetour_backend
+    build: .
+    restart: on-failure
+    environment:
+      FLASK_DEBUG: "true"
+    ports:
+      - "8000:5000"
+    volumes:
+      - .:/src
+
+  db:
+    container_name: venetour_db
+    image: mongo:latest
+    restart: always
+    ports:
+        - "27017:27017"
+    volumes:
+        - data:/var/dbdata
+
+  compass:
+    container_name: compass
+    image: marmelab/compass:latest
+    ports:
+      - "80:80"
+    depends_on:
+      - db
+
+volumes:
+  data:
+    driver: local
