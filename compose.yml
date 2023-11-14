@@ -20,14 +20,6 @@ services:
     volumes:
         - data:/var/dbdata
 
-  compass:
-    container_name: compass
-    image: marmelab/compass:latest
-    ports:
-      - "80:80"
-    depends_on:
-      - db
-
 volumes:
   data:
     driver: local
