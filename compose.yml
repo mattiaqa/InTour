@@ -3,9 +3,7 @@ services:
   backend:
     container_name: venetour_backend
     build: .
-    restart: on-failure
-    environment:
-      FLASK_DEBUG: "true"
+    restart: always
     ports:
       - "8000:5000"
     volumes:
@@ -16,10 +14,14 @@ services:
     image: mongo:latest
     restart: always
     ports:
-        - "27017:27017"
+      - "27017:27017"
     volumes:
-        - data:/var/dbdata
+      - mongo_data:/var/mongo/db
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${DB_USER}
+      - MONGO_INITDB_ROOT_PASSWORD=${DB_PWD}
+      - MONGO_INITDB_DATABASE=venetour
 
-volumes:
-  data:
+volumes:  
+  mongo_data:
     driver: local

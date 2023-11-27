@@ -1,5 +1,9 @@
 flask
 sqlalchemy
-werkzeug
+bcrypt
 psycopg2-binary
 flask-jwt-extended
+pymongo
+pandas
+xlrd
+python-dotenv
