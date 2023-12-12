@@ -11,7 +11,7 @@ port = urllib.parse.quote_plus(os.environ.get('DB_PORT'))
 user = urllib.parse.quote_plus(os.environ.get('DB_USER'))
 pwd = urllib.parse.quote_plus(os.environ.get('DB_PWD'))
 
-mongo = pymongo.MongoClient('mongodb://%s:%s@%s:%s' % (user, pwd, host, port))["VeneTour"]
+mongo = pymongo.MongoClient('mongodb://%s:%s@%s:%s' % (user, pwd, host, port))["InTour"]
 
 token_blacklist = []
-percorsi = []
+trails = []

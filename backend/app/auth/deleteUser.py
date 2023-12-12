@@ -1,20 +1,25 @@
 from app.auth import bp 
-from flask import jsonify, request
+from flask import jsonify, request, current_app
 from app.extension import mongo
 from flask_jwt_extended import *
 
 @bp.route('/delete', methods=['POST'])
 @jwt_required()
 def deleteUser():
-    username = request.json['username']
+    try:
+        username = request.json['username']
 
-    if not username:
-        return jsonify({"Status": 401, "Reason":"Missing parameters!"})
+        if not username:
+            return jsonify({"Error":"Missing parameters!"}), 400
 
-    query = {"_id" : username}
-    result = mongo['users'].delete_one(query)
+        query = {"_id" : username}
+        result = mongo['users'].delete_one(query)
 
-    if result:
-        return 'Done', 200
+        if result:
+            return jsonify({"Status":"Success"}), 200
 
-    return "Something went wrong", 403
+        return jsonify({"Error":"Username not found"}), 404
+    except Exception as e:
+        current_app.logger.error("Internal Server Error: %s", e)
+        return jsonify({"Error":"Internal Server Error"}), 500
+

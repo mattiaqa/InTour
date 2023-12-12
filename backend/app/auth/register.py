@@ -2,7 +2,7 @@ import bcrypt
 from pymongo.errors import DuplicateKeyError
 
 from app.auth import bp 
-from flask import jsonify, request
+from flask import jsonify, request, current_app
 from app.extension import mongo
 
 @bp.route('/register', methods=['POST'])
@@ -10,9 +10,9 @@ def register():
     try:
         email = request.json['email']
         username = request.json['username']
-        nome = request.json['nome']
-        cognome = request.json['cognome']
-        dataNascita = request.json['dataNascita']
+        name = request.json['name']
+        surname = request.json['surname']
+        birthdate = request.json['birthdate']
         password = request.json['password'].encode('utf-8')
 
         salt = bcrypt.gensalt()
@@ -20,17 +20,19 @@ def register():
 
         newUser = {
             "_id": username,
-            "nome": nome,
-            "cognome": cognome,
+            "name": name,
+            "surname": surname,
             "email": email,
             "password": password,
-            "dataNascita": dataNascita,
+            "birthdate": birthdate,
             "friends" : []
         }
 
         result = mongo["users"].insert_one(newUser)
-
+        return jsonify({"Status":"Done"}), 200
+    
     except DuplicateKeyError:
-        return 'Username already taken', 403
-
-    return "Done", 200
+        return jsonify({"Error":"Username already taken"}), 403
+    except Exception as e:
+        current_app.logger.error("Internal Server Error: %s", e)
+        return jsonify({"Error":"Internal Server Error"})

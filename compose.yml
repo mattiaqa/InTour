@@ -1,7 +1,7 @@
 version: "3"
 services:
   backend:
-    container_name: venetour_backend
+    container_name: InTour_backend
     build: .
     restart: always
     ports:
@@ -10,7 +10,7 @@ services:
       - .:/src
 
   db:
-    container_name: venetour_db
+    container_name: InTour_db
     image: mongo:latest
     restart: always
     ports:
@@ -20,7 +20,7 @@ services:
     environment:
       - MONGO_INITDB_ROOT_USERNAME=${DB_USER}
       - MONGO_INITDB_ROOT_PASSWORD=${DB_PWD}
-      - MONGO_INITDB_DATABASE=venetour
+      - MONGO_INITDB_DATABASE=inTour
 
 volumes:  
   mongo_data:
