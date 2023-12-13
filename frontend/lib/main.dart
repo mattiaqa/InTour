@@ -19,8 +19,8 @@ class MyApp extends StatelessWidget {
           color: Colors.red,
         ),
         drawer: const AndroidView(
-          key: Key('negro'),
-          viewType: String.fromEnvironment('dio'),
+          key: Key('ciao'),
+          viewType: String.fromEnvironment('ciao'),
         ),
         bottomNavigationBar: BottomNavigationBar(items: const [
           BottomNavigationBarItem(label: 'Home', icon: Icon(Icons.home)),
