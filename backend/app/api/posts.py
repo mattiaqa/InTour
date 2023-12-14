@@ -2,19 +2,18 @@ import random
 import string
 import os 
 from datetime import datetime
-from bson import json_util
-import json
-
 from app.api import bp 
 from flask import jsonify, request, current_app
 from flask_jwt_extended import *
 from app.extension import mongo
-from app.utils import get_all_friends
+from app.utils import get_all_friends, isFriendOf
+from bson import ObjectId
 
 @bp.route('/post/upload', methods=['POST'])
 @jwt_required()
 def upload_posts():
     try:
+        #TODO: check MIME type
         if 'file' not in request.files:
             return jsonify({'error': 'No file found'}), 500
 
@@ -25,17 +24,19 @@ def upload_posts():
         user = get_jwt_identity()['username']
         description = request.form.get('description')
 
-        name = ''.join(random.choices(string.ascii_letters + string.digits, k=10)) + '.jpg'
+        object_id = ObjectId()
+        file_name = str(object_id) + '.jpg'
 
         upload_folder = f'uploads/{user}'
         if not os.path.exists(upload_folder):
             os.makedirs(upload_folder)
         
-        upload_url = f'{upload_folder}/{name}'
+        upload_url = f'{upload_folder}/{file_name}'
         uploaded_file.save(upload_url)
         current_date = datetime.now().date()
 
         new_post = {
+            "_id" : object_id,
             "creator" : user,
             "img_url" : upload_url,
             "description" : description,
@@ -45,36 +46,47 @@ def upload_posts():
         }
 
         mongo["posts"].insert_one(new_post)
+        return jsonify({"Status":"Success"}), 200
+    
     except Exception as e:
         current_app.logger.error("Internal Server Error: %s", e)
         return jsonify({"Error": "Internal Server Error"}), 500
 
-    return 'Done', 200
 
 @bp.route('/post/delete', methods=['POST'])
 @jwt_required()
 def delete_posts():
-    post_url = request.json['post_url']
-    user = get_jwt_identity()['username']
-    
     try:
-        query = {"img_url" : post_url}
-        mongo["posts"].delete_one(query)
-        os.remove(post_url)
-    except:
-        return jsonify({"error": "something went wrong"})
+        post_id = request.json.get('post_id')
+        user = get_jwt_identity()['username']
+        
+        # Check if the post_id is a valid ObjectId
+        if not ObjectId.is_valid(post_id):
+            return jsonify({"Error": "Invalid post_id format"}), 400
+        
+        query = {"_id": ObjectId(post_id)}
+        result = mongo["posts"].delete_one(query)
+        
+        # Check if the post was found and deleted
+        if result.deleted_count == 1:
+            os.remove(f"uploads/{user}/{post_id}.jpg")
+            return jsonify({"Status": "Success"}), 200
+        else:
+            return jsonify({"Error": "Post not found"}), 404
 
-    return 'Done', 200
+    except Exception as e:
+        current_app.logger.error("Internal Server Error: %s", e)
+        return jsonify({"Error": "Something went wrong"}), 500
 
 @bp.route('/post', methods=['GET'])
 @jwt_required()
 def fetch_friend_posts():
-    user = get_jwt_identity()['username']
-
     try:
+        user = get_jwt_identity()['username']
         friends_list = get_all_friends(user)
         result = []
-        #TODO: aggiungere il limite sul numero di post dinamico
+
+        #TODO: add dynamic post loading
         for friend in friends_list:
             friend_posts = mongo['posts'].find({'creator' : friend}).limit(10).sort('date')
 
@@ -83,6 +95,101 @@ def fetch_friend_posts():
                 result.append(post)
             
         return jsonify(result), 200
+
+    except Exception as e:
+        current_app.logger.error("Internal Server Error: %s", e)
+        return jsonify({"error": "something went wrong"}), 500
+    
+@bp.route('/post/comment', methods=['POST'])
+@jwt_required()
+def add_comment_to_post():
+    try:
+        user = get_jwt_identity()
+        post_id = request.json['post_id']
+        comment_text = request.json['comment']
+
+        if not post_id or not comment_text:
+            return jsonify({"Error":"Missing Parameters"}), 400
+        
+        post = mongo['posts'].find_one({'_id' : ObjectId(post_id)})
+
+        if not post:
+            return jsonify({"Error":"Post not found"}), 404
+        
+        if not isFriendOf(post['creator'], user['username']):
+            return jsonify({"Error":"Unathorized"}), 403
+        
+        comment = {
+            'user' : user['username'],
+            'comment': comment_text,
+            'comment_date': datetime.now().strftime("%Y-%m-%d")
+        }
+
+        mongo['posts'].update_one(
+            {'_id': ObjectId(post_id)},
+            {'$push': {'comments': comment}}
+        )
+
+        return jsonify({"Status":"Success"}), 200
+
+    except Exception as e:
+        current_app.logger.error("Internal Server Error: %s", e)
+        return jsonify({"error": "something went wrong"}), 500
+    
+
+@bp.route('/post/like', methods=['POST'])
+@jwt_required()
+def like_post():
+    try:
+        user = get_jwt_identity()
+        post_id = request.json['post_id']
+
+        if not post_id:
+            return jsonify({"Error":"Missing Parameters"}), 400
+        
+        post = mongo['posts'].find_one({'_id' : ObjectId(post_id)})
+
+        if not post:
+            return jsonify({"Error":"Post not found"}), 404
+        
+        if not isFriendOf(post['creator'], user['username']):
+            return jsonify({"Error":"Unathorized"}), 403
+    
+        mongo['posts'].update_one(
+            {'_id': ObjectId(post_id)},
+            {'$inc': {'like': 1}}
+        )
+
+        return jsonify({"Status":"Success"}), 200
+
+    except Exception as e:
+        current_app.logger.error("Internal Server Error: %s", e)
+        return jsonify({"error": "something went wrong"}), 500
+    
+@bp.route('/post/dislike', methods=['POST'])
+@jwt_required()
+def dislike_post():
+    try:
+        user = get_jwt_identity()
+        post_id = request.json['post_id']
+
+        if not post_id:
+            return jsonify({"Error":"Missing Parameters"}), 400
+        
+        post = mongo['posts'].find_one({'_id' : ObjectId(post_id)})
+
+        if not post:
+            return jsonify({"Error":"Post not found"}), 404
+        
+        if not isFriendOf(post['creator'], user['username']):
+            return jsonify({"Error":"Unathorized"}), 403
+    
+        mongo['posts'].update_one(
+            {'_id': ObjectId(post_id)},
+            {'$inc': {'like': -1}}
+        )
+
+        return jsonify({"Status":"Success"}), 200
 
     except Exception as e:
         current_app.logger.error("Internal Server Error: %s", e)
