@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/Screens/Percorsi/percorso_tile.dart';
 import 'package:frontend/utils/api_manager.dart';
 import 'dart:convert';
 
@@ -12,13 +13,13 @@ class Percorsi extends StatefulWidget
 class PercorsiState extends State<Percorsi>
 {
   late Future _future;
-  String trailData = '';
+  List<PercorsoTile> trails = [];
 
 
   @override
-  void initState() {
+  void initState() 
+  {
     super.initState();
-
     _future = _fetchPercorsi();
   }
 
@@ -27,12 +28,12 @@ class PercorsiState extends State<Percorsi>
     var response = await ApiManager.fetchData('trails');
     if (response != null) 
     {
-      var results = json.decode(response) as List?;
-      print(results);
+      response = response.replaceAll(' NaN,', '"NaN",');
+      var results = jsonDecode(response) as List?;
+
       if (results != null) 
       {
-        //return results.map((e) => ExamTile.fromJson(e)).toList();
-        return results.toString();
+        return results.map((e) => PercorsoTile.fromJson(e)).toList();
       }
     }
     return [];
@@ -58,7 +59,7 @@ class PercorsiState extends State<Percorsi>
           } 
           else
           {
-            trailData = snapshot.data;
+            trails = snapshot.data;
             /*if (needsRefresh) 
             {
               needsRefresh = false;
@@ -76,6 +77,18 @@ class PercorsiState extends State<Percorsi>
 
   Widget _buildUI()
   {
-    return Text(trailData);
+    return ListView.builder
+    (
+      itemCount: trails.length,
+      itemBuilder: (context, index)
+      {
+        return PercorsoTile
+        (
+          title: trails[index].title, 
+          category: trails[index].category, 
+          startpoint: trails[index].startpoint
+        );
+      },
+    );
   }
 }
