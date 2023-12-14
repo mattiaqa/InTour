@@ -1,7 +1,7 @@
 import os 
 from datetime import datetime
 from app.api import bp 
-from flask import jsonify, request, current_app
+from flask import jsonify, request, current_app, send_from_directory
 from flask_jwt_extended import *
 from app.extension import mongo
 from app.utils import get_all_friends, isFriendOf, allowed_file
@@ -303,6 +303,38 @@ def dislike_post():
 
         return jsonify({"Status":"Success"}), 200
 
+    except Exception as e:
+        current_app.logger.error("Internal Server Error: %s", e)
+        return jsonify({"error": "something went wrong"}), 500
+    
+
+@bp.route('/uploads/<username>/<filename>')
+@jwt_required()
+def get_post_image(username, filename):
+    """
+        Give access to user's uploads
+
+        Returns:
+        - If successful, returns the file desired with a status of success
+          and an HTTP status code of 200.
+        - If the user does not have access to the resource, return an HTTP status code of 403.
+        - If any exceptions occur during the process, 
+          logs an internal server error and returns a JSON response with 
+          an error message ({'Error': 'Internal Server Error'}) 
+          and an HTTP status code of 500.
+    """
+    try:
+        user = get_jwt_identity()['username']
+
+        # if the user doesn't owns the folder, access is denied
+        if(user != username):
+            return jsonify({"Error":"Unauthorized"}), 403
+
+        # prevent path traversal
+        path = f'{username}/{filename}'
+        sanitezed_path = os.path.normpath(path)
+
+        return send_from_directory('uploads/', sanitezed_path), 200
     except Exception as e:
         current_app.logger.error("Internal Server Error: %s", e)
         return jsonify({"error": "something went wrong"}), 500

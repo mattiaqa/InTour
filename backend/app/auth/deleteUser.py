@@ -2,6 +2,7 @@ from app.auth import bp
 from flask import jsonify, request, current_app
 from app.extension import mongo
 from flask_jwt_extended import *
+import shutil
 
 @bp.route('/delete', methods=['POST'])
 @jwt_required()
@@ -16,6 +17,7 @@ def deleteUser():
         result = mongo['users'].delete_one(query)
 
         if result:
+            shutil.rmtree(f'uploads/{username}/')
             return jsonify({"Status":"Success"}), 200
 
         return jsonify({"Error":"Username not found"}), 404
