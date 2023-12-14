@@ -1,33 +1,44 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/Screens/borders.dart';
+import 'package:flutter_web_plugins/url_strategy.dart';
+import 'package:frontend/routes.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
 
+class MyApp extends StatelessWidget
+{
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        appBar: AppBar(title: const Text('App title')),
-        body: const Icon(
-          Icons.favorite,
-          size: 100,
-          color: Colors.red,
-        ),
-        drawer: const AndroidView(
-          key: Key('ciao'),
-          viewType: String.fromEnvironment('ciao'),
-        ),
-        bottomNavigationBar: BottomNavigationBar(items: const [
-          BottomNavigationBarItem(label: 'Home', icon: Icon(Icons.home)),
-          BottomNavigationBarItem(
-              label: 'Settings', icon: Icon(Icons.settings)),
-        ]),
-      ),
+  Widget build(BuildContext context)
+  {
+    return const MaterialApp
+    (
+      home: PageBorders(),
     );
   }
 }
+
+/*
+class _MyAppState extends State<MyApp>
+{
+  @override
+  void initState() {
+    super.initState();
+
+    usePathUrlStrategy();
+  }
+
+  @override
+  Widget build(BuildContext context)
+  {
+    return MaterialApp.router
+    (
+      debugShowCheckedModeBanner: false,
+      routerConfig: router,
+      //builder: (context, child) => PageBorders(child: child!)
+    );
+  }
+}
+*/
