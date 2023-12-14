@@ -6,7 +6,7 @@ import shutil
 
 @bp.route('/delete', methods=['POST'])
 @jwt_required()
-def deleteUser():
+def delete_user():
     try:
         username = request.json['username']
 
