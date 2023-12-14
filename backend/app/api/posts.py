@@ -1,13 +1,12 @@
-import random
-import string
 import os 
 from datetime import datetime
 from app.api import bp 
 from flask import jsonify, request, current_app
 from flask_jwt_extended import *
 from app.extension import mongo
-from app.utils import get_all_friends, isFriendOf
+from app.utils import get_all_friends, isFriendOf, allowed_file
 from bson import ObjectId
+import magic 
 
 @bp.route('/post/upload', methods=['POST'])
 @jwt_required()
@@ -19,7 +18,15 @@ def upload_posts():
 
         uploaded_file = request.files['file']
         if uploaded_file.filename == '':
-            return jsonify({'error': 'Void name file'})
+            return jsonify({'error': 'Void name file'}), 500
+
+        if not allowed_file(uploaded_file.filename):
+            return jsonify({'error': 'Invalid file type. Only .png and .jpg allowed'}), 400
+
+        mime = magic.Magic(mime=True)
+        file_mime = mime.from_buffer(uploaded_file.stream.read(2048))
+        if file_mime not in ['image/jpeg', 'image/png']:
+            return jsonify({'error': 'Invalid MIME type. Only JPEG and PNG allowed'}), 400
 
         user = get_jwt_identity()['username']
         description = request.form.get('description')

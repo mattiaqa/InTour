@@ -11,7 +11,8 @@ RUN apk add --no-cache --update \
     libffi-dev openssl-dev \
     libxml2 libxml2-dev \
     libxslt libxslt-dev \
-    libjpeg-turbo-dev zlib-dev
+    libjpeg-turbo-dev zlib-dev \
+    libmagic
 
 RUN python3 -m pip install --upgrade pip
 

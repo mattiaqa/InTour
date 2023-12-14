@@ -3,6 +3,11 @@ from app.models.trail import Trail
 from app.extension import trails
 from app.extension import mongo
 
+ALLOWED_EXTENSIONS = {'png', 'jpg'}
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 def init_trails():
     data = pd.read_excel('/assets/datasets/sentieri-storico-culturali.xls')
 

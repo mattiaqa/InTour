@@ -7,3 +7,4 @@ pymongo
 pandas
 xlrd
 python-dotenv
+python-magic
