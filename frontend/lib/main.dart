@@ -3,8 +3,10 @@ import 'package:frontend/Screens/borders.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:frontend/routes.dart';
 
-void main() {
+void main() 
+{
   runApp(MyApp());
+  usePathUrlStrategy();
 }
 
 
@@ -13,9 +15,10 @@ class MyApp extends StatelessWidget
   @override
   Widget build(BuildContext context)
   {
-    return const MaterialApp
+    return MaterialApp.router
     (
-      home: PageBorders(),
+      debugShowCheckedModeBanner: false,
+      routerConfig: router,
     );
   }
 }

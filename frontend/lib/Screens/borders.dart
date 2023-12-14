@@ -6,8 +6,8 @@ import 'package:go_router/go_router.dart';
 
 final pages =
 [
-  Bacheca(),
   Percorsi(),
+  Bacheca(),
 ];
 
 class PageBorders extends StatefulWidget
@@ -43,8 +43,8 @@ class PageBordersState extends State<PageBorders>
         selectedIndex: selectedIndex,
         destinations: 
         [
-          NavigationDestination(label: 'Bacheca', icon: Icon(Icons.home)),
           NavigationDestination(label: 'Percorsi', icon: Icon(Icons.navigation_rounded)),
+          NavigationDestination(label: 'Bacheca', icon: Icon(Icons.home)),
         ]
       ),
       

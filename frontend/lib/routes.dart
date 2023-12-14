@@ -1,24 +1,25 @@
 import 'package:frontend/Screens/Bacheca/bacheca.dart';
+import 'package:frontend/Screens/Login/login.dart';
 import 'package:frontend/Screens/Percorsi/percorsi.dart';
 import 'package:frontend/Screens/borders.dart';
 import 'package:go_router/go_router.dart';
 
 final router = GoRouter
 (
-  initialLocation: '/bacheca',
+  initialLocation: '/login',
   routes: <GoRoute>
   [
     GoRoute
     (
-      name: 'Percorsi',
-      path: '/percorsi',
-      builder: (context, state) => Percorsi()//Percorsi(key: state.pageKey,),
+      name: 'Login',
+      path: '/login',
+      builder: (context, state) => LoginPage()
     ),
     GoRoute
     (
-      name: 'Bacheca',
-      path: '/bacheca',
-      builder: (context, state) => Bacheca(),
+      name: 'Home',
+      path: '/home',
+      builder: (context, state) => PageBorders(),
     ),
   ]
 );
