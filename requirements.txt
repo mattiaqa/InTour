@@ -8,3 +8,4 @@ pandas
 xlrd
 python-dotenv
 python-magic
+spacy

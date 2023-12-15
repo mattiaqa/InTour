@@ -215,15 +215,15 @@ def add_comment_to_post():
         return jsonify({"error": "something went wrong"}), 500
 
 
-@bp.route('/post/comment', methods=['POST'])
+@bp.route('/post/comment', methods=['DELETE'])
 @jwt_required()
-def add_comment_to_post():
+def remove_comment_post():
     """
-        Add a comment to a post
+        Remove a comment's post
 
         Parameters:
         - post_id: id of the post.
-        - comment: text of the comment to be inserted
+        - comment: text of the comment to be removed
 
         Returns:
         - If successful, returns a JSON response with a status of success
@@ -248,23 +248,23 @@ def add_comment_to_post():
         if not post:
             return jsonify({"Error":"Post not found"}), 404
         
-        # if the current user is not friend of the post's creator, denies access
-        if not isFriendOf(post['creator'], user['username']):
-            return jsonify({"Error":"Unathorized"}), 403
-        
-        comment = {
-            'user' : user['username'],
-            'comment': comment_text,
-            'comment_date': datetime.now().strftime("%Y-%m-%d")
-        }
+        comments = post.get('comments', [])
 
-        mongo['posts'].update_one(
-            {'_id': ObjectId(post_id)},
-            {'$push': {'comments': comment}}
-        )
+        # Find the index of the comment that matches the user and comment_text
+        index_to_delete = None
+        for i, comment in enumerate(comments):
+            if comment.get('user') == user['username'] and comment.get('comment') == comment_text:
+                index_to_delete = i
+                break
 
-        return jsonify({"Status":"Success"}), 200
+        if index_to_delete is not None:
+            del comments[index_to_delete]
+            # Update the post with the modified comments list
+            mongo['posts'].update_one({'_id': ObjectId(post_id)}, {'$set': {'comments': comments}})
 
+            return jsonify({"Status":"Success"}), 200
+
+        return jsonify({"Error":"Comment not found"}), 404
     except Exception as e:
         current_app.logger.error("Internal Server Error: %s", e)
         return jsonify({"error": "something went wrong"}), 500 

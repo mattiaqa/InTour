@@ -18,6 +18,7 @@ RUN python3 -m pip install --upgrade pip
 
 ADD requirements.txt .
 RUN  python3 -m pip install -r requirements.txt
+RUN  python3 -m spacy download it_core_news_lg
 
 EXPOSE 5000
 
