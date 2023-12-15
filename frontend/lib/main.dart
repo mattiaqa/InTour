@@ -3,20 +3,15 @@ import 'package:frontend/Screens/borders.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:frontend/routes.dart';
 
-void main() 
-{
+void main() {
   runApp(MyApp());
   usePathUrlStrategy();
 }
 
-
-class MyApp extends StatelessWidget
-{
+class MyApp extends StatelessWidget {
   @override
-  Widget build(BuildContext context)
-  {
-    return MaterialApp.router
-    (
+  Widget build(BuildContext context) {
+    return MaterialApp.router(
       debugShowCheckedModeBanner: false,
       routerConfig: router,
     );
