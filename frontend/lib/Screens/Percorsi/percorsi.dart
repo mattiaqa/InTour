@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/Screens/Percorsi/dettagli_percorso.dart';
 import 'package:frontend/Screens/Percorsi/percorso_tile.dart';
 import 'package:frontend/utils/api_manager.dart';
 import 'dart:convert';
+
+import 'package:go_router/go_router.dart';
 
 class Percorsi extends StatefulWidget
 {
@@ -13,7 +16,8 @@ class Percorsi extends StatefulWidget
 class PercorsiState extends State<Percorsi>
 {
   late Future _future;
-  List<PercorsoTile> trails = [];
+  List<Percorso> trails = [];
+  List<PercorsoTile> trailsTiles = [];
 
 
   @override
@@ -33,7 +37,7 @@ class PercorsiState extends State<Percorsi>
 
       if (results != null) 
       {
-        return results.map((e) => PercorsoTile.fromJson(e)).toList();
+        return results.map((e) => Percorso.fromJson(e)).toList();
       }
     }
     return [];
@@ -86,7 +90,8 @@ class PercorsiState extends State<Percorsi>
         (
           title: trails[index].title, 
           category: trails[index].category, 
-          startpoint: trails[index].startpoint
+          startpoint: trails[index].startpoint,
+          onTap: () => context.push('/percorso', extra: trails[index]),
         );
       },
     );

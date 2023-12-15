@@ -111,14 +111,13 @@ class BachecaTile extends StatelessWidget
                             size: 40,
                           ),
                           onTap: () {
-                            //context.go('/comments');
+                            context.push('/comments', extra: comments);
                           },
                         ),
                         
                         Text(comments!.length.toString())
                       ]
                     ),
-                    
                   ],
                 ),
               )
