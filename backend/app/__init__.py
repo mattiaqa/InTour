@@ -18,6 +18,7 @@ def create_app(config_class=Config):
 
     init_trails()
     
+    # logging configuration
     handler = logging.FileHandler(filename='log.log')
     formatter = logging.Formatter("%(asctime)s;%(levelname)s;%(message)s",
                               "%Y-%m-%d %H:%M:%S")

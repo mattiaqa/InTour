@@ -69,19 +69,19 @@ Widget profileHeaderWidget(BuildContext context) {
               )
             ],
           ),
-          SizedBox(
+          const SizedBox(
             height: 8,
           ),
           Container(
             alignment: Alignment.bottomCenter,
-            child: Text(
+            child: const Text(
               "Descrizione",
               style: TextStyle(
                 letterSpacing: 0.4,
               ),
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 20,
           ),
         ],

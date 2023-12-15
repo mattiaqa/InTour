@@ -1,13 +1,13 @@
 class Trail:
     def __init__(self, trail):
-        self.category = trail[0]
-        self.title = trail[2]
-        self.summary = trail[3]
-        self.description = trail[4]
-        self.tips = trail[5]
-        self.security = trail[6]
-        self.startpoint = trail[9]
-        self.endpoint = trail[10]
+        self.category = trail.iloc[0]
+        self.title = trail.iloc[2]
+        self.summary = trail.iloc[3]
+        self.description = trail.iloc[4]
+        self.tips = trail.iloc[5]
+        self.security = trail.iloc[6]
+        self.startpoint = trail.iloc[9]
+        self.endpoint = trail.iloc[10]
 
     def to_dict(self):
         return {
