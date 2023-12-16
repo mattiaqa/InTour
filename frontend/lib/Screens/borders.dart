@@ -1,53 +1,45 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/Screens/Bacheca/bacheca.dart';
 import 'package:frontend/Screens/Percorsi/percorsi.dart';
+import 'package:frontend/Screens/Profilo/profilo.dart';
 import 'package:go_router/go_router.dart';
 
+final pages = [Percorsi(), Bacheca(), const ProfiloPage()];
 
-final pages =
-[
-  Percorsi(),
-  Bacheca(),
-];
-
-class PageBorders extends StatefulWidget
-{
-  const PageBorders({super.key, /*required this.child*/});
-
+class PageBorders extends StatefulWidget {
+  const PageBorders({
+    super.key,
+    /*required this.child*/
+  });
+  static const route = '/home';
   @override
   State<PageBorders> createState() => PageBordersState();
 }
 
-class PageBordersState extends State<PageBorders>
-{
+class PageBordersState extends State<PageBorders> {
   String pageName = 'InTour';
   int selectedIndex = 0;
 
   @override
-  Widget build(BuildContext context)
-  {
-    return Scaffold
-    (
+  Widget build(BuildContext context) {
+    return Scaffold(
       appBar: AppBar(title: Text(pageName)),
       body: pages[selectedIndex],
-      bottomNavigationBar: NavigationBar
-      (
-        onDestinationSelected: (index) 
-        {
-          setState(() 
-          {
-            selectedIndex = index;
-          });
-        },
+      bottomNavigationBar: NavigationBar(
+          onDestinationSelected: (index) {
+            setState(() {
+              selectedIndex = index;
+            });
+          },
+          selectedIndex: selectedIndex,
+          destinations: const [
+            NavigationDestination(
+                label: 'Percorsi', icon: Icon(Icons.navigation_rounded)),
+            NavigationDestination(label: 'Bacheca', icon: Icon(Icons.home)),
+            NavigationDestination(
+                label: 'Profilo', icon: Icon(Icons.account_circle_rounded)),
+          ]),
 
-        selectedIndex: selectedIndex,
-        destinations: 
-        [
-          NavigationDestination(label: 'Percorsi', icon: Icon(Icons.navigation_rounded)),
-          NavigationDestination(label: 'Bacheca', icon: Icon(Icons.home)),
-        ]
-      ),
-      
       /*body: Stack
       (
         children: 
@@ -91,7 +83,7 @@ class PageBordersState extends State<PageBorders>
             )
           ),
         ],
-      )*/ 
+      )*/
     );
   }
 }
