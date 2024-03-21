@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/Screens/Percorsi/header_percorso.dart';
 
 class Percorso
 {
@@ -43,8 +44,28 @@ class DettagliPercorsoState extends State<DettagliPercorso>
     return Scaffold
     (
       appBar: AppBar(title: Text("Dettagli percorso")),
-      body: SingleChildScrollView
+      body: CustomScrollView
       (
+        slivers: 
+        [
+          SliverPersistentHeader
+          (
+            pinned: true,
+            floating: false,
+            delegate: PercorsoHeader(
+            minHeight: 60.0,
+            maxHeight: 200.0,
+            child: Container
+            (
+              color: Colors.lightBlue, child: Center(child: Text(widget.percorso.title.toString()))
+            ),
+      ),
+          ),
+
+          
+        ],
+
+        /*
         child: Column
         (
           children: 
@@ -89,7 +110,7 @@ class DettagliPercorsoState extends State<DettagliPercorso>
               ]
             )
           ).toList()
-        ),
+        ),*/
       )
     );
   }

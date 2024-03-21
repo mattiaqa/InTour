@@ -7,6 +7,8 @@ from app.extension import mongo
 from app.utils import get_all_friends, isFriendOf, allowed_file
 from bson import ObjectId
 import magic 
+import sys
+from flask import send_file
 
 @bp.route('/post/upload', methods=['POST'])
 @jwt_required()
@@ -214,61 +216,6 @@ def add_comment_to_post():
         current_app.logger.error("Internal Server Error: %s", e)
         return jsonify({"error": "something went wrong"}), 500
 
-
-@bp.route('/post/comment', methods=['POST'])
-@jwt_required()
-def add_comment_to_post():
-    """
-        Add a comment to a post
-
-        Parameters:
-        - post_id: id of the post.
-        - comment: text of the comment to be inserted
-
-        Returns:
-        - If successful, returns a JSON response with a status of success
-          and an HTTP status code of 200.
-        - If the requests is not valid, return an HTTP status code of 400.
-        - If the post is not found, return an HTTP status code of 404.
-        - If any exceptions occur during the process, 
-          logs an internal server error and returns a JSON response with 
-          an error message ({'Error': 'Internal Server Error'}) 
-          and an HTTP status code of 500.
-    """
-    try:
-        user = get_jwt_identity()
-        post_id = request.json['post_id']
-        comment_text = request.json['comment']
-
-        if not post_id or not comment_text:
-            return jsonify({"Error":"Missing Parameters"}), 400
-        
-        post = mongo['posts'].find_one({'_id' : ObjectId(post_id)})
-
-        if not post:
-            return jsonify({"Error":"Post not found"}), 404
-        
-        # if the current user is not friend of the post's creator, denies access
-        if not isFriendOf(post['creator'], user['username']):
-            return jsonify({"Error":"Unathorized"}), 403
-        
-        comment = {
-            'user' : user['username'],
-            'comment': comment_text,
-            'comment_date': datetime.now().strftime("%Y-%m-%d")
-        }
-
-        mongo['posts'].update_one(
-            {'_id': ObjectId(post_id)},
-            {'$push': {'comments': comment}}
-        )
-
-        return jsonify({"Status":"Success"}), 200
-
-    except Exception as e:
-        current_app.logger.error("Internal Server Error: %s", e)
-        return jsonify({"error": "something went wrong"}), 500 
-
 @bp.route('/post/like', methods=['POST'])
 @jwt_required()
 def like_post():
@@ -363,7 +310,7 @@ def dislike_post():
     
 
 @bp.route('/uploads/<username>/<filename>')
-@jwt_required()
+#@jwt_required()
 def get_post_image(username, filename):
     """
         Give access to user's uploads
@@ -378,17 +325,19 @@ def get_post_image(username, filename):
           and an HTTP status code of 500.
     """
     try:
-        user = get_jwt_identity()['username']
+        #user = get_jwt_identity()['username']
 
         # if the user doesn't owns the folder, access is denied
-        if(user != username):
-            return jsonify({"Error":"Unauthorized"}), 403
+        #if(user != username):
+        #    return jsonify({"Error":"Unauthorized"}), 403
 
         # prevent path traversal
         path = f'{username}/{filename}'
         sanitezed_path = os.path.normpath(path)
 
-        return send_from_directory('uploads/', sanitezed_path), 200
+        print(sanitezed_path, file=sys.stderr)
+
+        return send_file(f'/src/uploads/{sanitezed_path}', mimetype='image/jpeg'), 200
     except Exception as e:
         current_app.logger.error("Internal Server Error: %s", e)
         return jsonify({"error": "something went wrong"}), 500

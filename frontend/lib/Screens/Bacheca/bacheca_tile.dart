@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/Screens/Bacheca/commento_tile.dart';
+import 'package:frontend/Screens/Bacheca/like_icon.dart';
+import 'package:frontend/Screens/Bacheca/profilo_nome_foto.dart';
+import 'package:frontend/utils/constants.dart';
 import 'package:go_router/go_router.dart';
 
 class BachecaTile extends StatelessWidget 
@@ -60,21 +63,26 @@ class BachecaTile extends StatelessWidget
       (
         children: 
         [
-          Text(username!),
-          const SizedBox
+          
+          Container//SizedBox
           (
-            height: 300,
-            width: 300,
-            child: Image
+            //height: 300,
+            //width: 300,
+            child: Image.network
             (
-              image:AssetImage("assets/images/Placeholder_view_vector.svg.png"),
+              "http://$myIP:8000/api/$imagePath"
+              //image:AssetImage("assets/images/Placeholder_view_vector.svg.png"),
             ),
           ),
+          
+          TinyProfile(username: username!, description: description,),
+          
           Row
           (
             children: 
             [
-              Text(date!),
+              Text("\t\t\t$date"),
+              
               Expanded
               (
                 child: Row
@@ -87,11 +95,7 @@ class BachecaTile extends StatelessWidget
                       mainAxisAlignment: MainAxisAlignment.center,
                       children:
                       [
-                        const Icon
-                        (
-                          Icons.favorite_border, 
-                          size: 40,
-                        ),
+                        LikeButton(liked: true),
                         Text(likes.toString())
                       ]
                     ),
@@ -123,10 +127,6 @@ class BachecaTile extends StatelessWidget
               )
             ],
           ),
-
-          Divider(height: 20, thickness: 0,),
-
-          Text(description!),
         ],
       )
     );
