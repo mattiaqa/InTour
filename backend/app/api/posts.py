@@ -1,7 +1,7 @@
 import os 
 from datetime import datetime
 from app.api import bp 
-from flask import jsonify, request, current_app, send_from_directory
+from flask import jsonify, request, current_app, send_file
 from flask_jwt_extended import *
 from app.extension import mongo
 from app.utils import get_all_friends, isFriendOf, allowed_file
@@ -38,14 +38,13 @@ def upload_posts():
             return jsonify({'error': 'Void name file'}), 400
 
         # check extension
-        if not allowed_file(uploaded_file.filename):
-            return jsonify({'error': 'Invalid file type. Only .png and .jpg allowed'}), 400
+        #if not allowed_file(uploaded_file.filename):
+        #    return jsonify({'error': 'Invalid file type. Only .png and .jpg allowed'}), 400
 
         # check MIME type
-        mime = magic.Magic(mime=True)
-        file_mime = mime.from_buffer(uploaded_file.stream.read(2048))
-        if file_mime not in ['image/jpeg', 'image/png']:
-            return jsonify({'error': 'Invalid MIME type. Only JPEG and PNG allowed'}), 400
+        #mime = magic.Magic(mime=True)
+        #if file_mime not in ['image/jpeg', 'image/png']:
+        #    return jsonify({'error': 'Invalid MIME type. Only JPEG and PNG allowed'}), 400
 
         user = get_jwt_identity()['username']
         description = request.form.get('description')
@@ -54,14 +53,14 @@ def upload_posts():
         object_id = ObjectId()
 
         # use of the ObjectId as the file name
-        file_name = str(object_id) + '.jpg'
+        #file_name = str(object_id) + '.jpg'
 
         # if current user' directory does not exists, create new one
-        upload_folder = f'uploads/{user}'
+        upload_folder = f'/src/backend/static/uploads/{user}'
         if not os.path.exists(upload_folder):
             os.makedirs(upload_folder)
         
-        upload_url = f'{upload_folder}/{file_name}'
+        upload_url = f'{upload_folder}/{uploaded_file.filename}'
         uploaded_file.save(upload_url)
 
         # calculate the current date
@@ -381,14 +380,14 @@ def get_post_image(username, filename):
         user = get_jwt_identity()['username']
 
         # if the user doesn't owns the folder, access is denied
-        if(user != username):
-            return jsonify({"Error":"Unauthorized"}), 403
+        #if(user != username or not isFriendOf(username, user)):
+        #    return jsonify({"Error":"Unauthorized"}), 403
 
         # prevent path traversal
-        path = f'{username}/{filename}'
-        sanitezed_path = os.path.normpath(path)
+        path = f'/src/backend/static/uploads/{username}/{filename}'
+        #sanitezed_path = os.path.normpath(path)
 
-        return send_from_directory('uploads/', sanitezed_path), 200
+        return send_file(path, mimetype='image/jpeg'), 200
     except Exception as e:
         current_app.logger.error("Internal Server Error: %s", e)
         return jsonify({"error": "something went wrong"}), 500

@@ -1,5 +1,4 @@
 flask
-sqlalchemy
 bcrypt
 psycopg2-binary
 flask-jwt-extended
@@ -8,4 +7,4 @@ pandas
 xlrd
 python-dotenv
 python-magic
-spacy
+numpy
