@@ -1,5 +1,6 @@
 class Trail:
-    def __init__(self, trail):
+    def __init__(self, trail, trail_id):
+        self.trail_id = trail_id
         self.category = trail.iloc[0]
         self.title = trail.iloc[2]
         self.summary = trail.iloc[3]
@@ -11,6 +12,7 @@ class Trail:
 
     def to_dict(self):
         return {
+            "trail_id" : self.trail_id,
             "category" : self.category,
             "title" : self.title,
             "summary" : self.summary,

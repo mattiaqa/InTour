@@ -2,17 +2,18 @@ import pandas as pd
 from app.models.trail import Trail
 from app.extension import trails
 from app.extension import mongo
-
-ALLOWED_EXTENSIONS = {'png', 'jpg'}
+from app.extension import trails
 
 def allowed_file(filename):
+    ALLOWED_EXTENSIONS = {'png', 'jpeg'}
+
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 def init_trails():
     data = pd.read_excel('/assets/datasets/sentieri-storico-culturali.xls')
 
     for index, row in data.iterrows():
-        percorso = Trail(row)
+        percorso = Trail(row, index)
         trails.append(percorso)
 
 def get_all_friends(user):

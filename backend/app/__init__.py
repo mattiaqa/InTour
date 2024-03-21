@@ -3,9 +3,10 @@ from config import Config
 from flask_jwt_extended import JWTManager
 from app.utils import init_trails
 import logging 
+import pandas as pd
 
 def create_app(config_class=Config):
-    app = Flask(__name__)
+    app = Flask(__name__, static_folder="/src/backend/static")
     app.config.from_object(config_class)
 
     from app.api import bp as api_bp
