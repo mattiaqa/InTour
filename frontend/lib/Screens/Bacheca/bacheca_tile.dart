@@ -70,7 +70,7 @@ class BachecaTile extends StatelessWidget
             //width: 300,
             child: Image.network
             (
-              "http://$myIP:8000/api/$imagePath"
+              "http://$myIP:8000" + imagePath
               //image:AssetImage("assets/images/Placeholder_view_vector.svg.png"),
             ),
           ),

@@ -60,12 +60,12 @@ class LoginPageState extends State<LoginPage> {
             userController.text.toString(), passwordController.text.toString())
         .then((value) {
       if (value) {
-        _fetchUser().then((user) {
-          if (user != null) {
-            AppService.instance.setUserData(user);
+        //_fetchUser().then((user) {
+          //if (user != null) {
+            //AppService.instance.setUserData(user);
             context.go('/home');
-          } else {}
-        });
+          //} else {}
+        //});
       } else {
         /*setState(() {
             borderColor = Color.fromARGB(255, 255, 0, 0);

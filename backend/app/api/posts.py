@@ -6,9 +6,6 @@ from flask_jwt_extended import *
 from app.extension import mongo
 from app.utils import get_all_friends, isFriendOf, allowed_file
 from bson import ObjectId
-import magic 
-import sys
-from flask import send_file
 
 @bp.route('/post/upload', methods=['POST'])
 @jwt_required()
@@ -68,10 +65,12 @@ def upload_posts():
         # calculate the current date
         current_date = datetime.now().date()
 
+        img_url = f'/uploads/{user}/{uploaded_file.filename}'
+
         new_post = {
             "_id" : object_id,
             "creator" : user,
-            "img_url" : upload_url,
+            "img_url" : img_url,
             "description" : description,
             "date" : str(current_date), 
             "like" : 0,
@@ -270,6 +269,7 @@ def remove_comment_post():
         current_app.logger.error("Internal Server Error: %s", e)
         return jsonify({"error": "something went wrong"}), 500
 
+
 @bp.route('/post/like', methods=['POST'])
 @jwt_required()
 def like_post():
@@ -382,8 +382,8 @@ def get_post_image(username, filename):
         #user = get_jwt_identity()['username']
 
         # if the user doesn't owns the folder, access is denied
-        #if(user != username or not isFriendOf(username, user)):
-        #    return jsonify({"Error":"Unauthorized"}), 403
+        if(user != username or not isFriendOf(username, user)):
+            return jsonify({"Error":"Unauthorized"}), 403
 
         # prevent path traversal
         path = f'/src/backend/static/uploads/{username}/{filename}'
