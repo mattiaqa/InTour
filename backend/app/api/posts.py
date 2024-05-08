@@ -382,8 +382,8 @@ def get_post_image(username, filename):
         #user = get_jwt_identity()['username']
 
         # if the user doesn't owns the folder, access is denied
-        if(user != username or not isFriendOf(username, user)):
-            return jsonify({"Error":"Unauthorized"}), 403
+        #if(user != username or not isFriendOf(username, user)):
+            #return jsonify({"Error":"Unauthorized"}), 403
 
         # prevent path traversal
         path = f'/src/backend/static/uploads/{username}/{filename}'

@@ -27,7 +27,7 @@ def get_user_data():
         current_app.logger.error("Internal Server Error: %s", e)
         return jsonify({"Error": "Internal Server Error"}), 500
 
-@bp.route('/profile/post', methods=['GET'])
+@bp.route('/profile/posts', methods=['GET'])
 @jwt_required()
 def get_user_post():
     """

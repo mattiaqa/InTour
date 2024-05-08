@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:frontend/utils/auth_service.dart';
 import 'package:frontend/Screens/Login/login.dart';
 import 'package:frontend/profile_data.dart';
 import 'package:hive_flutter/hive_flutter.dart';
