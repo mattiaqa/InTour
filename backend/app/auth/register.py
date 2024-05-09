@@ -28,6 +28,7 @@ def register():
             "email": email,
             "password": password,
             "birthdate": birthdate,
+            "profile_image_url": "",
             "friends" : []
         }
 

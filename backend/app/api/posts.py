@@ -4,7 +4,7 @@ from app.api import bp
 from flask import jsonify, request, current_app, send_file
 from flask_jwt_extended import *
 from app.extension import mongo
-from app.utils import get_all_friends, isFriendOf, allowed_file
+from app.utils import get_all_friends, isFriendOf
 from bson import ObjectId
 
 @bp.route('/post/upload', methods=['POST'])
@@ -362,7 +362,7 @@ def dislike_post():
     
 
 @bp.route('/uploads/<username>/<filename>')
-@jwt_required()
+#@jwt_required()
 def get_post_image(username, filename):
     """
         Give access to user's uploads
@@ -377,11 +377,11 @@ def get_post_image(username, filename):
           and an HTTP status code of 500.
     """
     try:
-        user = get_jwt_identity()['username']
+        #user = get_jwt_identity()['username']
 
         # if the user doesn't owns the folder, access is denied
-        if(not isFriendOf(username, user)):
-            return jsonify({"Error":"Unauthorized"}), 403
+        #if(user != username or not isFriendOf(username, user)):
+            #return jsonify({"Error":"Unauthorized"}), 403
 
         # prevent path traversal
         path = f'/src/backend/static/uploads/{username}/{filename}'

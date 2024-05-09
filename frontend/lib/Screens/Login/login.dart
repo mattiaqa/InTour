@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/profile_data.dart';
 import 'package:frontend/utils/api_manager.dart';
@@ -21,12 +22,20 @@ class LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text("InTour"),
-        ),
+            //title: Text("InTour"),
+            ),
         body: Form(
             child: AutofillGroup(
+                child: SingleChildScrollView(
           child: Column(
             children: [
+              Padding(
+                padding: EdgeInsets.all(50),
+                child: Text(
+                  "InTour",
+                  style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold),
+                ),
+              ),
               Padding(
                 padding: EdgeInsets.all(20),
                 child: TextField(
@@ -49,10 +58,27 @@ class LoginPageState extends State<LoginPage> {
               Padding(
                   padding: EdgeInsets.all(20),
                   child: ElevatedButton(
-                      onPressed: () => tryLogin(context), child: Text("Login")))
+                    child: Text("Login"),
+                    onPressed: () => tryLogin(context),
+                  )),
+              Padding(
+                  padding: EdgeInsets.all(20),
+                  child: RichText(
+                    text: TextSpan(children: [
+                      TextSpan(
+                          text: "Non hai un account? ",
+                          style: TextStyle(color: Colors.black)),
+                      TextSpan(
+                        text: "Registrati",
+                        style: TextStyle(color: Colors.blue),
+                        recognizer: TapGestureRecognizer()
+                          ..onTap = () => GoRouter.of(context).go("/register"),
+                      )
+                    ]),
+                  ))
             ],
           ),
-        )));
+        ))));
   }
 
   void tryLogin(BuildContext context) {
@@ -60,12 +86,12 @@ class LoginPageState extends State<LoginPage> {
             userController.text.toString(), passwordController.text.toString())
         .then((value) {
       if (value) {
-        //_fetchUser().then((user) {
-          //if (user != null) {
-            //AppService.instance.setUserData(user);
+        _fetchUser().then((user) {
+          if (user != null) {
+            AppService.instance.setUserData(user);
             context.go('/home');
-          //} else {}
-        //});
+          } else {}
+        });
       } else {
         /*setState(() {
             borderColor = Color.fromARGB(255, 255, 0, 0);
@@ -83,9 +109,10 @@ Future<Profile_Data?> _fetchUser() async {
   try {
     final response = await ApiManager.fetchData('profile/data');
     if (response != null) {
-      final List<dynamic> results = json.decode(response);
+      print(json.decode(response));
+      final results = json.decode(response);
       if (results.isNotEmpty) {
-        return Profile_Data.fromJson(results.first);
+        return Profile_Data.fromJson(results);
       }
     }
   } catch (e) {
