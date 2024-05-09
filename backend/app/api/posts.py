@@ -31,19 +31,14 @@ def upload_posts():
         if 'file' not in request.files:
             return jsonify({'error': 'No file found'}), 400
 
-        # check if name file is void
+        # check if filename is void
         uploaded_file = request.files['file']
         if uploaded_file.filename == '':
-            return jsonify({'error': 'Void name file'}), 400
+            return jsonify({'error': 'Void filename'}), 400
 
         # check extension
-        #if not allowed_file(uploaded_file.filename):
+        #if not allowed_file(uploaded_file.):
         #    return jsonify({'error': 'Invalid file type. Only .png and .jpg allowed'}), 400
-
-        # check MIME type
-        #mime = magic.Magic(mime=True)
-        #if file_mime not in ['image/jpeg', 'image/png']:
-        #    return jsonify({'error': 'Invalid MIME type. Only JPEG and PNG allowed'}), 400
 
         user = get_jwt_identity()['username']
         description = request.form.get('description')
@@ -61,11 +56,14 @@ def upload_posts():
         
         upload_url = f'{upload_folder}/{uploaded_file.filename}'
         uploaded_file.save(upload_url)
+        uploaded_url_renamed = f'{upload_folder}/{object_id}'
+
+        os.rename(upload_url, uploaded_url_renamed)
 
         # calculate the current date
         current_date = datetime.now().date()
 
-        img_url = f'/uploads/{user}/{uploaded_file.filename}'
+        img_url = f'/uploads/{user}/{object_id}'
 
         new_post = {
             "_id" : object_id,
@@ -364,7 +362,7 @@ def dislike_post():
     
 
 @bp.route('/uploads/<username>/<filename>')
-#@jwt_required()
+@jwt_required()
 def get_post_image(username, filename):
     """
         Give access to user's uploads
@@ -379,10 +377,10 @@ def get_post_image(username, filename):
           and an HTTP status code of 500.
     """
     try:
-        #user = get_jwt_identity()['username']
+        user = get_jwt_identity()['username']
 
         # if the user doesn't owns the folder, access is denied
-        if(user != username or not isFriendOf(username, user)):
+        if(not isFriendOf(username, user)):
             return jsonify({"Error":"Unauthorized"}), 403
 
         # prevent path traversal
