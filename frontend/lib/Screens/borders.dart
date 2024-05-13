@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:frontend/Screens/Bacheca/bacheca.dart';
 import 'package:frontend/Screens/Percorsi/percorsi.dart';
 import 'package:frontend/Screens/Profilo/profilo.dart';
+import 'package:frontend/Screens/share.dart';
 import 'package:go_router/go_router.dart';
 
-final pages = [Percorsi(), Bacheca(), const ProfiloPage()];
+final pages = [Percorsi(), Bacheca(), SharePage(), const ProfiloPage()];
 
 class PageBorders extends StatefulWidget {
   const PageBorders({
@@ -23,7 +24,7 @@ class PageBordersState extends State<PageBorders> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(pageName)),
+      //appBar: AppBar(title: Text(pageName)),
       body: pages[selectedIndex],
       bottomNavigationBar: NavigationBar(
           onDestinationSelected: (index) {
@@ -35,7 +36,10 @@ class PageBordersState extends State<PageBorders> {
           destinations: const [
             NavigationDestination(
                 label: 'Percorsi', icon: Icon(Icons.navigation_rounded)),
-            NavigationDestination(label: 'Bacheca', icon: Icon(Icons.home)),
+            NavigationDestination(
+              label: 'Bacheca', icon: Icon(Icons.home)),
+            NavigationDestination(
+                label: 'Pubblica', icon: Icon(Icons.photo_camera_back_outlined)),
             NavigationDestination(
                 label: 'Profilo', icon: Icon(Icons.account_circle_rounded)),
           ]),
