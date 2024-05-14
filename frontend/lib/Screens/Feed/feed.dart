@@ -53,7 +53,21 @@ class BachecaState extends State<Bacheca>
   {
     return Scaffold
     (
-      appBar: PageTitle(title: "Bacheca",),
+      appBar: PageTitle
+      (
+        title: "Bacheca",
+        actions: 
+        [
+          IconButton
+          (
+            icon: Icon(Icons.search_rounded),
+            onPressed: ()
+            {
+              context.push('/searchuser');
+            },
+          )
+        ],
+      ),
       body: ListView.builder
       (
         itemCount: posts.length,

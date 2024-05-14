@@ -85,7 +85,7 @@ class BachecaTile extends StatelessWidget {
                   //mainAxisAlignment: MainAxisAlignment.end,
                   children:
                   [
-                    LikeButton(liked: true),
+                    LikeButton(liked: false),
                     const VerticalDivider
                     (
                       width: 20,
