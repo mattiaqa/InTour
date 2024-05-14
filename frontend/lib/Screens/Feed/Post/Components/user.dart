@@ -3,13 +3,13 @@ import 'package:flutter/material.dart';
 class TinyProfile extends StatefulWidget
 {
   String username;
-  String? description;
+  String date;
 
   TinyProfile
   (
     {
       required this.username,
-      this.description,
+      required this.date,
     }
   );
 
@@ -26,11 +26,11 @@ class TinyProfileState extends State<TinyProfile>
     (
       leading: const CircleAvatar
       (
-        radius: 28,
-        backgroundImage: AssetImage('assets/images/no_profile_pic.png'),
+        radius: 20,
+        backgroundImage: NetworkImage("https://picsum.photos/200/300"),
       ),
       title: Text(widget.username),
-      subtitle: Text(widget.description ??= ''),
+      subtitle: Text(widget.date),
     );
   }
 }

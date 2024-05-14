@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
 import 'dart:convert';
+import './app_service.dart';
 
 class Response {
   late bool valid;
@@ -33,25 +34,6 @@ class AuthService {
     return false;
   }
 
-  static Future<bool> logout() async {
-    try {
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      final String? accessToken = prefs.getString("access_token");
-      final response = await http.post(
-        Uri.parse('http://$myIP:8000/auth/logout'),
-        headers: {"Authorization": 'Bearer $accessToken'},
-      );
-
-      if (response.statusCode == 200) {
-        await prefs.remove("access_token");
-        AppService.instance.manageAutoLogout();
-        return true;
-      }
-    } catch (e) {
-      print('Errore durante il logout: $e');
-    }
-    return false;
-  }
 
   static Future<Response> register(String email, String name, String surname,
       String username, String password) async {
@@ -84,5 +66,25 @@ class AuthService {
     }
 
     return Response(false, error);
+  }
+
+  static Future<bool> logout() async {
+    try {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final String? accessToken = prefs.getString("access_token");
+      final response = await http.post(
+        Uri.parse('http://$myIP:8000/auth/logout'),
+        headers: {"Authorization": 'Bearer $accessToken'},
+      );
+
+      if (response.statusCode == 200) {
+        await prefs.remove("access_token");
+        AppService.instance.manageAutoLogout();
+        return true;
+      }
+    } catch (e) {
+      print('Errore durante il logout: $e');
+    }
+    return false;
   }
 }
