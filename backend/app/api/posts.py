@@ -71,7 +71,7 @@ def upload_posts():
             "img_url" : img_url,
             "description" : description,
             "date" : str(current_date), 
-            "like" : 0,
+            "like" : [],
             "comments" : []
         }
 
@@ -305,7 +305,7 @@ def like_post():
     
         mongo['posts'].update_one(
             {'_id': ObjectId(post_id)},
-            {'$inc': {'like': 1}}
+            {'$push': {'like': user['username']}}
         )
 
         return jsonify({"Status":"Success"}), 200
