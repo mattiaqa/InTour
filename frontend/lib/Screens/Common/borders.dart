@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/Screens/Bacheca/bacheca.dart';
+import 'package:frontend/Screens/Feed/feed.dart';
 import 'package:frontend/Screens/Percorsi/percorsi.dart';
-import 'package:frontend/Screens/Profilo/profilo.dart';
-import 'package:frontend/Screens/share.dart';
+import 'package:frontend/Screens/Profile/profilo.dart';
+import 'package:frontend/Screens/Share/share.dart';
 import 'package:go_router/go_router.dart';
 
 final pages = [Percorsi(), Bacheca(), SharePage(), const ProfiloPage()];

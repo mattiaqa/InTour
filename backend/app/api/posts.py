@@ -4,7 +4,7 @@ from app.api import bp
 from flask import jsonify, request, current_app, send_file
 from flask_jwt_extended import *
 from app.extension import mongo
-from app.utils import get_all_friends, isFriendOf, allowed_file
+from app.utils import get_all_friends, isFriendOf
 from bson import ObjectId
 
 @bp.route('/post/upload', methods=['POST'])
@@ -31,19 +31,14 @@ def upload_posts():
         if 'file' not in request.files:
             return jsonify({'error': 'No file found'}), 400
 
-        # check if name file is void
+        # check if filename is void
         uploaded_file = request.files['file']
         if uploaded_file.filename == '':
-            return jsonify({'error': 'Void name file'}), 400
+            return jsonify({'error': 'Void filename'}), 400
 
         # check extension
-        #if not allowed_file(uploaded_file.filename):
+        #if not allowed_file(uploaded_file.):
         #    return jsonify({'error': 'Invalid file type. Only .png and .jpg allowed'}), 400
-
-        # check MIME type
-        #mime = magic.Magic(mime=True)
-        #if file_mime not in ['image/jpeg', 'image/png']:
-        #    return jsonify({'error': 'Invalid MIME type. Only JPEG and PNG allowed'}), 400
 
         user = get_jwt_identity()['username']
         description = request.form.get('description')
@@ -61,11 +56,14 @@ def upload_posts():
         
         upload_url = f'{upload_folder}/{uploaded_file.filename}'
         uploaded_file.save(upload_url)
+        uploaded_url_renamed = f'{upload_folder}/{object_id}'
+
+        os.rename(upload_url, uploaded_url_renamed)
 
         # calculate the current date
         current_date = datetime.now().date()
 
-        img_url = f'/uploads/{user}/{uploaded_file.filename}'
+        img_url = f'/uploads/{user}/{object_id}'
 
         new_post = {
             "_id" : object_id,

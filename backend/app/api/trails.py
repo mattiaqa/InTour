@@ -27,29 +27,3 @@ def get_all_path():
         current_app.logger.error("Internal Server Error: %s", e)
         return jsonify({"Error": "Internal Server Error"}), 500
     
-
-@bp.route('/trails/rate', methods=['POST'])
-@jwt_required()
-def like_trail():
-    try:
-      user = get_jwt_identity()['username']
-      rate = request.json['rate']
-      trail_id = request.json['trail_id']
-
-      if not rate or not trail_id:
-          return jsonify({"Error":"Missing Parameters"}), 400
-
-      record = {
-          "trail_id" : trail_id,
-          "user_id" : user,
-          "rate" : rate
-      }
-
-      df = pd.DataFrame([record])
-      df.to_csv('/assets/datasets/ratings.csv', mode='a', header=False, index=False)
-      
-      return jsonify({"Status":"Success"}), 200
-    
-    except Exception as e:
-        current_app.logger.error("Internal Server Error: %s", e)
-        return jsonify({"Error": "Internal Server Error"}), 500

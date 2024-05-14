@@ -27,6 +27,9 @@ def add_friends():
         friend_to_add = request.json['username']
         user = get_jwt_identity()['username']
 
+        if(friend_to_add == user):
+            return jsonify({"Status": "Success"}), 200
+
         friend = mongo['users'].find_one(
             {'_id':friend_to_add}
         )

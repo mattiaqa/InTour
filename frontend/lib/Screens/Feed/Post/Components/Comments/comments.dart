@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/Screens/Bacheca/commento_tile.dart';
+import 'package:frontend/Screens/Feed/Post/Components/Comments/tile.dart';
 import 'package:frontend/Screens/Percorsi/percorso_tile.dart';
 import 'package:frontend/utils/api_manager.dart';
 import 'dart:convert';
