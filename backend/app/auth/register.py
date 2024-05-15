@@ -29,7 +29,9 @@ def register():
             "password": password,
             "birthdate": birthdate,
             "profile_image_url": "",
-            "friends" : []
+            "friends" : [],
+            "friends_request": [],
+            "friends_pending":[]
         }
 
         mongo["users"].insert_one(newUser)
