@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:frontend/Screens/Common/appbar.dart';
+import 'package:frontend/Screens/Profile/Components/friendrequest.dart';
 import 'package:frontend/Screens/Profile/Components/profiledata.dart';
 import 'package:frontend/Screens/Profile/Components/profilepic.dart';
 import 'package:frontend/utils/api_manager.dart';
@@ -12,7 +13,16 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:frontend/utils/constants.dart';
 
 class ProfiloPage extends StatefulWidget {
-  const ProfiloPage({Key? key}) : super(key: key);
+  
+  String username;
+  
+  ProfiloPage
+  (
+    {
+      Key? key,
+      required this.username
+    }
+  ) : super(key: key);
 
   @override
   _ProfiloPage createState() => _ProfiloPage();
@@ -81,16 +91,7 @@ class _ProfiloPage extends State<ProfiloPage> {
 
                             SizedBox(height: 20),
 
-                            SizedBox
-                            (
-                              height: 30,
-                              width: 200,
-                              child: ElevatedButton
-                              (
-                                onPressed: () {},
-                                child: Text("Modifica")
-                              )
-                            )
+                            FirendRequestButton(username: widget.username)
                           ],
                         )
                       ],

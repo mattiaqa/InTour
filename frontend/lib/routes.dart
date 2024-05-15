@@ -6,6 +6,7 @@ import 'package:frontend/Screens/Feed/Post/Components/Comments/comments.dart';
 import 'package:frontend/Screens/Feed/Post/Components/Comments/tile.dart';
 import 'package:frontend/Screens/Authentication/Login/login.dart';
 import 'package:frontend/Screens/Authentication/Register/register.dart';
+import 'package:frontend/Screens/Feed/search.dart';
 import 'package:frontend/Screens/Percorsi/dettagli_percorso.dart';
 import 'package:frontend/Screens/Percorsi/percorsi.dart';
 import 'package:frontend/Screens/Authentication/Register/success.dart';
@@ -32,16 +33,11 @@ var router =
       name: 'RegisterSuccess',
       path: '/success',
       builder: (context, state) => RegisterSuccessPage()),
+  
   GoRoute(
     name: 'Home',
     path: '/home',
     builder: (context, state) => PageBorders(),
-  ),
-  GoRoute(
-    name: 'Post comments',
-    path: '/comments',
-    builder: (context, state) =>
-        Commenti(commenti: state.extra as List<CommentoTile>),
   ),
   GoRoute(
     name: 'Dettagli percorso',
@@ -49,10 +45,18 @@ var router =
     builder: (context, state) =>
         DettagliPercorso(percorso: state.extra as Percorso),
   ),
+
+  GoRoute(
+    name: 'Post comments',
+    path: '/comments',
+    builder: (context, state) =>
+        Commenti(commenti: state.extra as List<CommentoTile>),
+  ),
+  
   GoRoute(
     name: 'Profilo',
     path: '/profilo',
-    builder: (context, state) => ProfiloPage()),
+    builder: (context, state) => ProfiloPage(username: state.extra as String,)),
   GoRoute(
     name: 'Share',
     path: '/share',
@@ -64,7 +68,18 @@ var router =
   GoRoute(
     name: 'ShareSuccess',
     path: '/sharesuccess',
-    builder: (context, state) => ShareSuccessPage())
+    builder: (context, state) => ShareSuccessPage()),
+  
+  GoRoute(
+    name: 'Feed',
+    path: '/feed',
+    builder: (context, state) => Bacheca()),
+  GoRoute(
+    name: 'SearchUser',
+    path: '/searchuser',
+    builder: (context, state) => SearchUserPage()),
+  
+
 ]);
 
 String? _redirect(BuildContext context, GoRouterState state) {

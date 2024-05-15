@@ -3,9 +3,16 @@ import 'package:frontend/Screens/Feed/feed.dart';
 import 'package:frontend/Screens/Percorsi/percorsi.dart';
 import 'package:frontend/Screens/Profile/profilo.dart';
 import 'package:frontend/Screens/Share/share.dart';
+import 'package:frontend/utils/app_service.dart';
 import 'package:go_router/go_router.dart';
 
-final pages = [Percorsi(), Bacheca(), SharePage(), const ProfiloPage()];
+final pages = 
+[
+  Percorsi(), 
+  Bacheca(), 
+  SharePage(), 
+  ProfiloPage(username: AppService.instance.currentUser!.userid!,)
+];
 
 class PageBorders extends StatefulWidget {
   const PageBorders({
