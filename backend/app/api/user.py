@@ -4,10 +4,11 @@ from flask_jwt_extended import *
 from app.extension import mongo
 import os 
 from bson import ObjectId
+import re
 
-@bp.route('/profile/data', methods=['GET'])
+@bp.route('/profile/<username>/data', methods=['GET'])
 @jwt_required()
-def get_user_data():
+def get_user_data(username):
     """
         Retrive all the data of the current user.
 
@@ -20,7 +21,7 @@ def get_user_data():
           and an HTTP status code of 500.
     """
     try:
-        user = get_jwt_identity()['username']
+        user = username
 
         user_data = mongo['users'].find_one({'_id': user}, {'password': 0})
 
@@ -29,9 +30,9 @@ def get_user_data():
         current_app.logger.error("Internal Server Error: %s", e)
         return jsonify({"Error": "Internal Server Error"}), 500
 
-@bp.route('/profile/posts', methods=['GET'])
+@bp.route('/profile/<username>/posts', methods=['GET'])
 @jwt_required()
-def get_user_post():
+def get_user_post(username):
     """
         Retrive all the posts of the current user.
 
@@ -44,7 +45,7 @@ def get_user_post():
           and an HTTP status code of 500.
     """
     try:
-        user = get_jwt_identity()['username']
+        user = username
 
         posts = mongo['posts'].find({'creator':user})
 
@@ -136,6 +137,29 @@ def edit_profile_image():
 
         return jsonify({"Status":"Success"}), 200
     
+    except Exception as e:
+        current_app.logger.error("Internal Server Error: %s", e)
+        return jsonify({"Error": "Internal Server Error"}), 500
+    
+
+@bp.route('/profile/search', methods=['POST'])
+def search_user():
+    try:
+        query = request.json['query']
+
+        regex_pattern = f".*{query}.*"
+        result = []
+
+        users = mongo['users'].find(
+            {"_id": {"$regex": regex_pattern, "$options": "i"}},
+            {"password": 0, "friends_request": 0, "friends_pending": 0}
+            )
+
+        for user in users:
+            user['_id'] = str(user['_id'])
+            result.append(user)
+
+        return jsonify(result), 200
     except Exception as e:
         current_app.logger.error("Internal Server Error: %s", e)
         return jsonify({"Error": "Internal Server Error"}), 500
