@@ -4,14 +4,14 @@ import 'package:flutter/rendering.dart';
 class ProfileData extends StatelessWidget
 {
   int posts;
-  int friends;
+  int? friends;
 
   ProfileData
   (
     {
       super.key,
       required this.posts,
-      required this.friends
+      this.friends
     }
   );
 
@@ -39,28 +39,36 @@ class ProfileData extends StatelessWidget
           ],
         ),
 
-        SizedBox(
-          width: 30,
+        Visibility
+        (
+          visible: friends != null,
+          child: SizedBox(
+            width: 30,
+          )
         ),
 
-        Column(
-          children: [
-            Text(
-              friends.toString(),
-              style: TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.w700,
+        Visibility
+        (
+          visible: friends != null,
+          child: Column(
+            children: [
+              Text(
+                friends.toString(),
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
-            ),
-            Text(
-              "Amici",
-              style: TextStyle(
-                letterSpacing: 0.4,
-                fontSize: 15,
-              ),
-            )
-          ],
-        ),
+              Text(
+                "Amici",
+                style: TextStyle(
+                  letterSpacing: 0.4,
+                  fontSize: 15,
+                ),
+              )
+            ],
+          ),
+        )
       ],
     );
   }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class TinyProfile extends StatefulWidget
 {
@@ -31,6 +32,7 @@ class TinyProfileState extends State<TinyProfile>
       ),
       title: Text(widget.username),
       subtitle: Text(widget.date),
+      onTap: () => context.push('/profilo', extra: widget.username),
     );
   }
 }

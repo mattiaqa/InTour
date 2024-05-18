@@ -15,15 +15,7 @@ class Bacheca extends StatefulWidget
 
 class BachecaState extends State<Bacheca>
 {
-  late Future _future;
   List<BachecaTile> posts = [];
-
-  @override
-  void initState()
-  {
-    super.initState();
-    _future = _fetchPosts();
-  }
 
   @override
   Widget build(BuildContext context)
@@ -35,12 +27,12 @@ class BachecaState extends State<Bacheca>
       {
         if (snapshot.connectionState == ConnectionState.waiting) 
         {
-          return const CircularProgressIndicator(); // Placeholder while loading
+          return Center(child: CircularProgressIndicator()); // Placeholder while loading
         } 
         
         if (snapshot.hasError) 
         {
-          return Text('Error: ${snapshot.error}');
+          return Center(child: Text('Error: ${snapshot.error}'));
         } 
          
         posts = snapshot.data!;
@@ -75,11 +67,12 @@ class BachecaState extends State<Bacheca>
         {
           return BachecaTile
           (
-            username: posts[index].username, 
+            id: posts[index].id,
+            username: posts[index].username,
             date: posts[index].date, 
             imagePath: posts[index].imagePath,
             description: posts[index].description,
-            likes: posts[index].likes,
+            likers: posts[index].likers,
             comments: posts[index].comments,
           );
         },
@@ -94,12 +87,26 @@ class BachecaState extends State<Bacheca>
     if (response != null) 
     {
       //response = response.replaceAll(' NaN,', '"NaN",');
-      var results = jsonDecode(response) as List?;
-
-      if (results != null) 
+      List<dynamic> posts = jsonDecode(response);
+      List<BachecaTile> result = List.empty(growable: true);
+      posts.forEach((post) 
       {
-       return results.map((elem) => BachecaTile.fromJson(elem)).toList().reversed.toList();
-      }
+        result.add
+        (
+          BachecaTile(
+            id: post['_id'],
+            username: post['creator'], 
+            date: post['date'], 
+            imagePath: post['img_url'],
+            description: post['description'],
+            likers: post['like'],
+            comments: post['comments'],
+          )
+        );
+      });
+      
+        
+      return result;
     }
     return [];
   }

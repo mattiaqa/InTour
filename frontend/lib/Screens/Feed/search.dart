@@ -62,6 +62,9 @@ class SearchUserPageState extends State<SearchUserPage>
                       backgroundImage: NetworkImage("https://picsum.photos/200/300"),
                     ),
                     title: Text(_searchResults[index]),
+                    onTap: () {
+                      context.push('/profilo', extra: _searchResults[index]);
+                    },
                   );
                 },
               )
@@ -93,7 +96,7 @@ class SearchUserPageState extends State<SearchUserPage>
       if(query.length < 3)
         _searchResults = List.empty();
       else
-        _searchResults = List.generate(10, (index) => '$query - Risultato $index');
+        _searchResults = List.generate(10, (index) => '$query' /* - Risultato $index'*/);
     });
   }
 

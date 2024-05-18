@@ -146,7 +146,7 @@ def fetch_friend_posts():
 
         #TODO: add dynamic post loading
         for friend in friends_list:
-            friend_posts = mongo['posts'].find({'creator' : friend}).limit(10).sort('date')
+            friend_posts = mongo['posts'].find({'creator' : friend}).sort('date')
 
             for post in friend_posts:
                 post['_id'] = str(post['_id'])

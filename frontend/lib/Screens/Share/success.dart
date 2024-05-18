@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/utils/app_service.dart';
 import 'package:go_router/go_router.dart';
 
 class ShareSuccessPage extends StatelessWidget
@@ -40,7 +41,7 @@ class ShareSuccessPage extends StatelessWidget
                 ElevatedButton
                 (
                   child: Text("Vai al profilo"),
-                  onPressed: () => context.go('/profilo'),
+                  onPressed: () => context.go('/userprofile', extra: AppService.instance.currentUser!.userid),
                 )
               ],
             ),

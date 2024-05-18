@@ -29,37 +29,41 @@ class ProfiloPage extends StatefulWidget {
 }
 
 class _ProfiloPage extends State<ProfiloPage> {
-  String nome = AppService.instance.currentUser?.userid ?? 'User';
   @override
   Widget build(BuildContext context) {
+   
     return FutureBuilder<List<dynamic>>(
-        future: getPosts(),
+        future: getPostsOfUser(widget.username),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return CircularProgressIndicator(); // Mostra un indicatore di caricamento mentre si ottengono le SharedPreferences
           }
 
           if (snapshot.hasError) {
-            return Text(
-                'Errore durante il recupero dei post: ${snapshot.error}');
+            return Text('Errore durante il recupero dei post: ${snapshot.error}');
           }
           
           return Scaffold
           (
             appBar: PageTitle
             (
-              title: nome,
+              title: widget.username,
               actions: 
               [
-                IconButton
+                Visibility
                 (
-                  icon: Icon(Icons.logout_rounded),
-                  onPressed: () 
-                  {
-                    AuthService.logout();
-                    context.go('/login');
-                  },
-                ),
+                  visible: widget.username == AppService.instance.currentUser!.userid,
+                  child: IconButton
+                  (
+                    icon: Icon(Icons.logout_rounded),
+                    onPressed: () 
+                    {
+                      AuthService.logout();
+                      context.go('/login');
+                    },
+                  )
+                ) 
+                
               ],
             ),
             body: SingleChildScrollView
@@ -85,8 +89,11 @@ class _ProfiloPage extends State<ProfiloPage> {
                           [
                             ProfileData
                             (
-                              posts: snapshot.data!.length, 
-                              friends: AppService.instance.currentUser!.friends!.length
+                              posts: snapshot.data!.length,
+                              friends: (widget.username == AppService.instance.currentUser!.userid) ?
+                                AppService.instance.currentUser!.friends!.length
+                                :
+                                null
                             ),
 
                             SizedBox(height: 20),
@@ -136,6 +143,14 @@ class _ProfiloPage extends State<ProfiloPage> {
 
 Future<List<dynamic>> getPosts() async {
   String? data = await ApiManager.fetchData('profile/posts');
+  List<dynamic> allposts = json.decode(data!);
+
+
+  return allposts;
+}
+
+Future<List<dynamic>> getPostsOfUser(String user) async {
+  String? data = await ApiManager.fetchData('profile/$user/posts');
   List<dynamic> allposts = json.decode(data!);
 
 

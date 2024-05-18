@@ -58,6 +58,14 @@ var router =
     path: '/profilo',
     builder: (context, state) => ProfiloPage(username: state.extra as String,)),
   GoRoute(
+    name: 'ProfiloUtente',
+    path: '/userprofile',
+    builder: (context, state) 
+    {
+      return PageBorders(selectedIndex: 3, username: state.extra as String,); 
+    }
+  ),
+  GoRoute(
     name: 'Share',
     path: '/share',
     builder: (context, state) => SharePage()),

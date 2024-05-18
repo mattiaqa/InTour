@@ -59,6 +59,37 @@ def get_user_post():
         current_app.logger.error("Internal Server Error: %s", e)
         return jsonify({"Error": "Internal Server Error"}), 500
     
+@bp.route('/profile/<username>/posts', methods=['GET'])
+@jwt_required()
+def get_user_post_(username):
+    """
+        Retrive all the posts of the current user.
+
+        Returns:
+        - If successful, returns a JSON list with all user posts
+          and an HTTP status code of 200.
+        - If any exceptions occur during the process, 
+          logs an internal server error and returns a JSON response with 
+          an error message ({'Error': 'Internal Server Error'}) 
+          and an HTTP status code of 500.
+    """
+    try:
+        #user = get_jwt_identity()['username']
+        user = username
+
+        posts = mongo['posts'].find({'creator':user})
+
+        result = []
+        for post in posts:
+                post['_id'] = str(post['_id'])
+                result.append(post)
+
+        return jsonify(result), 200
+    
+    except Exception as e:
+        current_app.logger.error("Internal Server Error: %s", e)
+        return jsonify({"Error": "Internal Server Error"}), 500
+    
 
 @bp.route('/profile/edit/description', methods=['POST'])
 @jwt_required()
