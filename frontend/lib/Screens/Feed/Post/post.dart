@@ -81,19 +81,17 @@ class BachecaTileState extends State<BachecaTile>
                   //mainAxisAlignment: MainAxisAlignment.end,
                   children:
                   [
-                    InkWell
+                    LikeButton
                     (
-                      child: LikeButton
-                      (
-                        liked: liked,
-                        postId: widget.id,
-                      ),
-                      onTap: () {
+                      liked: liked,
+                      postId: widget.id,
+                      onTap: () 
+                      {
                         setState(() {
                           likecount += liked ? -1 : 1;
                           liked = !liked;
                         });
-                      },
+                      }
                     ),
                     
                     const VerticalDivider

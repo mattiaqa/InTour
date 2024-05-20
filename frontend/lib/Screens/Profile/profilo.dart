@@ -154,5 +154,5 @@ Future<List<dynamic>> getPostsOfUser(String user) async {
   List<dynamic> allposts = json.decode(data!);
 
 
-  return allposts;
+  return allposts.reversed.toList();
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:frontend/utils/app_service.dart';
 
 class ProfileData extends StatelessWidget
 {
@@ -68,7 +69,7 @@ class ProfileData extends StatelessWidget
               )
             ],
           ),
-        )
+        ),
       ],
     );
   }

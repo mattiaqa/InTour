@@ -28,7 +28,7 @@ class ApiManager {
     }
   }
 
-  static Future<Map<String, dynamic>?> postData(
+  static Future<String?> postData(
       String endpoint, Map<String, dynamic> data) async 
   {
     String? token = await getToken();
@@ -43,7 +43,7 @@ class ApiManager {
 
     if (response.statusCode == 200) {
       // Se la risposta è 200 (OK), decodifica il JSON e restituisci i dati
-      return json.decode(response.body);
+      return response.body;//json.decode(response.body);
     } else {
       // Se la risposta non è 200, gestisci l'errore come preferisci
       print('Errore nella richiesta API: ${response.statusCode}');

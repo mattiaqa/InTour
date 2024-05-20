@@ -165,3 +165,38 @@ def remove_friends():
     except Exception as e:
         current_app.logger.error("Internal Server Error: %s", e)
         return jsonify({"Error": "Internal Server Error"}), 500
+
+
+@bp.route('/friends/undo_request', methods=['POST'])
+@jwt_required()
+def add_friends_undo_request():
+    try:
+        friend_to_add = request.json['username']
+        user = get_jwt_identity()['username']
+
+        if(friend_to_add == user):
+            return jsonify({"Status": "Success"}), 200
+
+        friend = mongo['users'].find_one(
+            {'_id':friend_to_add}
+        )
+
+        if(not friend):
+            return jsonify({"Error": "User not found"}), 404
+
+        # update the friends list for both of these two users
+        mongo['users'].update_one(
+            {'_id' : user},
+            {'$pull' : {'friends_pending' : friend_to_add}}
+        )
+
+        mongo['users'].update_one(
+            {'_id' : friend_to_add},
+            {'$pull' : {'friends_request' : user}}
+        )
+
+        return jsonify({"Status": "Success"}), 200
+    
+    except Exception as e:
+        current_app.logger.error("Internal Server Error: %s", e)
+        return jsonify({"Error": "Internal Server Error"}), 500

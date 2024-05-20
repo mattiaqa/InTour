@@ -1,7 +1,9 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:frontend/Screens/Common/appbar.dart';
+import 'package:frontend/utils/api_manager.dart';
 import 'package:go_router/go_router.dart';
 
 class SearchUserPage extends StatefulWidget
@@ -83,8 +85,16 @@ class SearchUserPageState extends State<SearchUserPage>
 
     _searchCompleter = localCompleter;
 
-    // Simulazione della ricerca con un Future che restituisce una lista di stringhe
-    await Future.delayed(Duration(seconds: 1)); // Simulazione di un'operazione asincrona
+    Map<String, dynamic> data = {
+      'query': _searchController.text,
+    };
+    var res = await ApiManager.postData('profile/search', data); 
+    var decoded = json.decode(res!);
+    _searchResults = List.empty(growable: true);
+    for(var i in decoded)
+    {
+      _searchResults.add(i["_id"]);
+    }
 
     // Se questa non è la ricerca corrente, interrompi
     if (currentSearchId != _searchId) {
@@ -95,8 +105,8 @@ class SearchUserPageState extends State<SearchUserPage>
     setState(() {
       if(query.length < 3)
         _searchResults = List.empty();
-      else
-        _searchResults = List.generate(10, (index) => '$query' /* - Risultato $index'*/);
+      //else
+        //_searchResults = List.generate(10, (index) => '$query' /* - Risultato $index'*/);
     });
   }
 

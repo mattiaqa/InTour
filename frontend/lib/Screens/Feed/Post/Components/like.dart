@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:frontend/utils/api_manager.dart';
 import 'package:frontend/utils/app_service.dart';
@@ -6,12 +8,14 @@ class LikeButton extends StatefulWidget
 {
   bool liked;
   String postId;
+  VoidCallback? onTap;
 
   LikeButton
   (
     {
       required this.liked,
       required this.postId,
+      this.onTap,
     }
   );
 
@@ -80,6 +84,9 @@ class LikeButtonState extends State<LikeButton>
           widget.liked = !widget.liked;
         });
         _controller.reverse().then((value) => _controller.forward());
+
+        if(widget.onTap != null)
+          widget.onTap!();
       }
     );
   }

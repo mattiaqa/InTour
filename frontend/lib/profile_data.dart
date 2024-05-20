@@ -14,6 +14,10 @@ class Profile_Data {
   final String? name;
   @HiveField(5)
   final List<String>? friends;
+  @HiveField(6)
+  final List<String>? friends_request;
+  @HiveField(7)
+  final List<String>? friends_pending;
 
   Profile_Data({
     required this.userid,
@@ -21,6 +25,8 @@ class Profile_Data {
     required this.email,
     required this.name,
     required this.friends,
+    required this.friends_pending,
+    required this.friends_request,
   });
 
   factory Profile_Data.fromJson(Map<String, dynamic> json) {
@@ -30,6 +36,14 @@ class Profile_Data {
       email: json['email'] ?? '',
       name: json['name'] ?? '',
       friends: (json['friends'] as List<dynamic>?)
+              ?.map((friend) => friend.toString())
+              .toList() ??
+          [],
+      friends_request: (json['friends_request'] as List<dynamic>?)
+              ?.map((friend) => friend.toString())
+              .toList() ??
+          [],
+      friends_pending: (json['friends_pending'] as List<dynamic>?)
               ?.map((friend) => friend.toString())
               .toList() ??
           [],
