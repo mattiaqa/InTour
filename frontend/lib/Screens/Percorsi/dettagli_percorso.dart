@@ -26,6 +26,7 @@ class Percorso
 
 }
 
+// ignore: must_be_immutable
 class DettagliPercorso extends StatefulWidget
 {
   Percorso percorso;

@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:frontend/Screens/Common/appbar.dart';
+import 'package:frontend/Screens/Profile/Components/profilepic.dart';
 import 'package:frontend/utils/api_manager.dart';
 import 'package:go_router/go_router.dart';
 
@@ -22,7 +23,7 @@ class SearchUserPage extends StatefulWidget
 class SearchUserPageState extends State<SearchUserPage>
 {
   TextEditingController _searchController = TextEditingController();
-  List<String> _searchResults = [];
+  List<SearchResult> _searchResults = [];
   late Completer<void> _searchCompleter = Completer<void>();
   int _searchId = 0;
 
@@ -58,12 +59,12 @@ class SearchUserPageState extends State<SearchUserPage>
                 itemCount: _searchResults.length,
                 itemBuilder: (context, index) {
                   return ListTile(
-                    leading: CircleAvatar
+                    leading: ProfilePic
                     (
+                      imagePath: _searchResults[index].imagePath!,
                       radius: 20,
-                      backgroundImage: NetworkImage("https://picsum.photos/200/300"),
                     ),
-                    title: Text(_searchResults[index]),
+                    title: Text(_searchResults[index].username),
                     onTap: () {
                       context.push('/profilo', extra: _searchResults[index]);
                     },
@@ -85,15 +86,23 @@ class SearchUserPageState extends State<SearchUserPage>
 
     _searchCompleter = localCompleter;
 
+    /* ottieni gli usernames e le foto profilo*/
+    _searchResults = List.empty(growable: true);
     Map<String, dynamic> data = {
       'query': _searchController.text,
     };
-    var res = await ApiManager.postData('profile/search', data); 
+    var res = await ApiManager.postData('profile/search', data);  
     var decoded = json.decode(res!);
-    _searchResults = List.empty(growable: true);
+    List<String> usernames = List.empty(growable: true);
+    List<String> images = List.empty(growable: true);
     for(var i in decoded)
     {
-      _searchResults.add(i["_id"]);
+      String username = i["_id"];
+      usernames.add(username);
+      String userdata = (await ApiManager.fetchData('profile/$username/data'))!;
+      String image = (json.decode(userdata))["profile_image_url"];
+      images.add(image);
+      _searchResults.add(SearchResult(username: username, imagePath: image));
     }
 
     // Se questa non è la ricerca corrente, interrompi
@@ -109,5 +118,15 @@ class SearchUserPageState extends State<SearchUserPage>
         //_searchResults = List.generate(10, (index) => '$query' /* - Risultato $index'*/);
     });
   }
+}
 
+class SearchResult
+{
+  String username;
+  String? imagePath;
+
+  SearchResult({
+    required this.username,
+    this.imagePath
+  });
 }

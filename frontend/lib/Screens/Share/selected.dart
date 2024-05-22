@@ -2,13 +2,11 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/Screens/Common/appbar.dart';
-import 'package:frontend/utils/api_manager.dart';
 import 'package:go_router/go_router.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:http/http.dart' as http;
 import 'package:frontend/utils/constants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+// ignore: must_be_immutable
 class SharePreviewPage extends StatefulWidget {
   
   File image;
@@ -107,6 +105,6 @@ Future<bool> uploadImage(
     "description": descriptionController.text.toString(),
     "file": await MultipartFile.fromFile(selectedImage.path)
   });
-  final response = await dio.post("http://$myIP:8000/api/post/upload", data: formData);
+  await dio.post("http://$myIP:8000/api/post/upload", data: formData);
   return true;
 }

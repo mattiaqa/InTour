@@ -1,10 +1,5 @@
-import 'dart:convert';
-
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:frontend/profile_data.dart';
-import 'package:frontend/utils/api_manager.dart';
-import 'package:frontend/utils/app_service.dart';
 import 'package:frontend/utils/auth_service.dart';
 import 'package:go_router/go_router.dart';
 
@@ -188,19 +183,4 @@ class RegisterPageState extends State<RegisterPage> {
         }
       });
   }
-}
-
-Future<Profile_Data?> _fetchUser() async {
-  try {
-    final response = await ApiManager.fetchData('profile/data');
-    if (response != null) {
-      final List<dynamic> results = json.decode(response);
-      if (results.isNotEmpty) {
-        return Profile_Data.fromJson(results.first);
-      }
-    }
-  } catch (e) {
-    print('Errore durante il recupero dei dati dell\'utente: $e');
-  }
-  return null;
 }

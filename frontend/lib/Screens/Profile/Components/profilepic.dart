@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
+import 'package:frontend/utils/constants.dart';
 
+// ignore: must_be_immutable
 class ProfilePic extends StatelessWidget
 {
   String imagePath;
+  double radius;
   ProfilePic
   (
     {
       super.key,
       required this.imagePath,
+      this.radius = 40
     }
   );
 
@@ -17,9 +20,8 @@ class ProfilePic extends StatelessWidget
   {
     return CircleAvatar
     (
-      radius: 40,
-      backgroundImage: NetworkImage(
-          imagePath),
+      radius: radius,
+      backgroundImage: NetworkImage("http://$myIP:8000/api" + imagePath),
     );
   }
 }

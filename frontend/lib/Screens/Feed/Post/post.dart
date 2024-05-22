@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/Screens/Feed/Post/Components/Comments/tile.dart';
 import 'package:frontend/Screens/Feed/Post/Components/like.dart';
 import 'package:frontend/Screens/Feed/Post/Components/user.dart';
 import 'package:frontend/utils/app_service.dart';
@@ -7,9 +6,11 @@ import 'package:frontend/utils/constants.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
+// ignore: must_be_immutable
 class BachecaTile extends StatefulWidget {
   String id;
   String? username;
+  String? userimage;
   String? date;
   String? description;
   String imagePath;
@@ -20,6 +21,7 @@ class BachecaTile extends StatefulWidget {
   ({
     required this.id,
     required this.username,
+    required this.userimage,
     required this.date,
     required this.imagePath,
     this.description,
@@ -62,6 +64,7 @@ class BachecaTileState extends State<BachecaTile>
           (
             username: widget.username!,
             date: formatDateToRelative(widget.date!),
+            image: widget.userimage!
           ),
           Container //SizedBox
           (

@@ -2,10 +2,9 @@ import 'package:flutter/material.dart';
 
 class CommentoTile extends StatelessWidget 
 {
-  String? user;
-  String? text;
-
-  void Function()? onTap;
+  final String? user;
+  final String? text;
+  final void Function()? onTap;
 
   CommentoTile
   ({

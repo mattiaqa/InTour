@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:frontend/utils/app_service.dart';
 
+// ignore: must_be_immutable
 class ProfileData extends StatelessWidget
 {
   int posts;

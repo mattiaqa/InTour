@@ -1,9 +1,7 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:frontend/utils/api_manager.dart';
-import 'package:frontend/utils/app_service.dart';
 
+// ignore: must_be_immutable
 class LikeButton extends StatefulWidget
 {
   bool liked;

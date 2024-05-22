@@ -1,13 +1,14 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
+import 'package:frontend/Screens/Common/uploadPictures.dart';
 import 'package:frontend/Screens/Feed/feed.dart';
 import 'package:frontend/Screens/Percorsi/percorsi.dart';
 import 'package:frontend/Screens/Profile/profilo.dart';
 import 'package:frontend/Screens/Share/share.dart';
 import 'package:frontend/utils/api_manager.dart';
 import 'package:frontend/utils/app_service.dart';
-import 'package:go_router/go_router.dart';
+import 'package:frontend/Screens/Common/bottomMenu.dart';
+import 'package:image_picker/image_picker.dart';
 
 var pages = 
 [
@@ -17,6 +18,7 @@ var pages =
   ProfiloPage(username: AppService.instance.currentUser!.userid!,)
 ];
 
+// ignore: must_be_immutable
 class PageBorders extends StatefulWidget {
   int ? selectedIndex;
   String ? username;
@@ -67,9 +69,28 @@ class PageBordersState extends State<PageBorders> {
           body: pages[selectedIndex],
           bottomNavigationBar: NavigationBar(
             onDestinationSelected: (index) {
-              setState(() {
-                selectedIndex = index;
-              });
+              if(index == 2)
+              {
+                ShowBottomMenu(context, "Nuovo post", 
+                [
+                  BottomMenuButton(
+                    icon: Icons.photo_camera_outlined, 
+                    text: "Scatta una foto", 
+                    action: () => PictureUploader.pickImage(ImageSource.camera)
+                  ),
+
+                  BottomMenuButton(
+                    icon: Icons.photo_library_outlined, 
+                    text: "Scegli dalla galleria", 
+                    action: () => PictureUploader.pickImage(ImageSource.gallery)
+                  ),
+                ]);
+              }
+              else{
+                setState(() {
+                  selectedIndex = index;
+                });
+              }
             },
             selectedIndex: selectedIndex,
             destinations: [

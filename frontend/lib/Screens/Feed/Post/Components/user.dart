@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/Screens/Profile/Components/profilepic.dart';
 import 'package:go_router/go_router.dart';
 
+// ignore: must_be_immutable
 class TinyProfile extends StatefulWidget
 {
   String username;
   String date;
+  String image;
 
   TinyProfile
   (
     {
       required this.username,
       required this.date,
+      required this.image
     }
   );
 
@@ -25,10 +29,10 @@ class TinyProfileState extends State<TinyProfile>
   {
     return ListTile
     (
-      leading: const CircleAvatar
+      leading: ProfilePic
       (
+        imagePath: widget.image,
         radius: 20,
-        backgroundImage: NetworkImage("https://picsum.photos/200/300"),
       ),
       title: Text(widget.username),
       subtitle: Text(widget.date),

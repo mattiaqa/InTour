@@ -65,16 +65,7 @@ class BachecaState extends State<Bacheca>
         itemCount: posts.length,
         itemBuilder: (context, index)
         {
-          return BachecaTile
-          (
-            id: posts[index].id,
-            username: posts[index].username,
-            date: posts[index].date, 
-            imagePath: posts[index].imagePath,
-            description: posts[index].description,
-            likers: posts[index].likers,
-            comments: posts[index].comments,
-          );
+          return posts[index];
         },
       )
     );
@@ -84,31 +75,30 @@ class BachecaState extends State<Bacheca>
   Future<List<BachecaTile>> _fetchPosts() async 
   {
     var response = await ApiManager.fetchData('post');
-    if (response != null) 
+    if (response == null) 
+      return [];
+
+    List<dynamic> posts = jsonDecode(response);
+    List<BachecaTile> result = List.empty(growable: true);
+    for(var post in posts)
     {
-      //response = response.replaceAll(' NaN,', '"NaN",');
-      List<dynamic> posts = jsonDecode(response);
-      List<BachecaTile> result = List.empty(growable: true);
-      posts.forEach((post) 
-      {
-        result.add
-        (
-          BachecaTile(
-            id: post['_id'],
-            username: post['creator'], 
-            date: post['date'], 
-            imagePath: post['img_url'],
-            description: post['description'],
-            likers: post['like'],
-            comments: post['comments'],
-          )
-        );
-      });
-      
-        
-      return result.reversed.toList();
+      String userdata = (await ApiManager.fetchData("profile/${post['creator']}/data"))!;
+      String profilepic = (json.decode(userdata))["profile_image_url"];
+      result.add
+      (
+        BachecaTile(
+          id: post['_id'],
+          username: post['creator'],
+          userimage: profilepic,
+          date: post['date'], 
+          imagePath: post['img_url'],
+          description: post['description'],
+          likers: post['like'],
+          comments: post['comments'],
+        )
+      );
     }
-    return [];
+    return result.reversed.toList();
   }
 
 }
