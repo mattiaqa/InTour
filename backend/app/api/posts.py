@@ -351,7 +351,7 @@ def dislike_post():
     
         mongo['posts'].update_one(
             {'_id': ObjectId(post_id)},
-            {'$inc': {'like': -1}}
+            {'$pull': {'like': user['username']}}
         )
 
         return jsonify({"Status":"Success"}), 200

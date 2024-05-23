@@ -2,6 +2,7 @@ from app.api import bp
 from flask import jsonify, request, current_app
 from flask_jwt_extended import *
 from app.extension import mongo
+from app.utils import isFriendOf
 
 @bp.route('/friends/request', methods=['POST'])
 @jwt_required()
@@ -11,7 +12,7 @@ def add_friends_request():
         user = get_jwt_identity()['username']
 
         if(friend_to_add == user):
-            return jsonify({"Status": "Success"}), 200
+            return jsonify({"Error": "You cannot send the request to yourself"}), 204
 
         friend = mongo['users'].find_one(
             {'_id':friend_to_add}
@@ -19,6 +20,9 @@ def add_friends_request():
 
         if(not friend):
             return jsonify({"Error": "User not found"}), 404
+
+        if(isFriendOf(user, friend_to_add)):
+            return jsonify({"Error": "User is already your friend!"}), 204
 
         # update the friends list for both of these two users
         mongo['users'].update_one(
@@ -52,7 +56,7 @@ def add_friends():
 
         user = mongo['users'].find_one(
             {'_id':current_user}
-        )  
+        )
 
         if(friend_to_add not in user['friends_request']):
             return jsonify({"Error": "User not in friend requests"}), 404

@@ -87,6 +87,9 @@ def edit_profile_description():
             {'$set' : {'description' : new_description}}
         )
 
+        current_app.logger.info("%s", user)
+        current_app.logger.info("%s", new_description)
+
         return jsonify({"message": "Description updated successfully"}), 200
     except Exception as e:
         current_app.logger.error("Internal Server Error: %s", e)
@@ -160,6 +163,30 @@ def search_user():
             result.append(user)
 
         return jsonify(result), 200
+    except Exception as e:
+        current_app.logger.error("Internal Server Error: %s", e)
+        return jsonify({"Error": "Internal Server Error"}), 500
+    
+
+@bp.route('/profile/remove/image', methods=['POST'])
+@jwt_required()
+def remove_profile_image():
+    try:
+        user = get_jwt_identity()['username']
+
+        image_url = mongo['users'].find_one(
+            {'_id' : user},
+            {'profile_image_url' : 1}
+        )
+
+        os.remove(f"/src/backend/static/{image_url['profile_image_url']}")
+
+        mongo['users'].update_one(
+            {'_id' : user},
+            {'$set' : {'profile_image_url' : ""}}
+        )
+        
+        return jsonify({"Status":"Success"}), 200
     except Exception as e:
         current_app.logger.error("Internal Server Error: %s", e)
         return jsonify({"Error": "Internal Server Error"}), 500
