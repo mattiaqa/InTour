@@ -15,15 +15,7 @@ class Bacheca extends StatefulWidget
 
 class BachecaState extends State<Bacheca>
 {
-  late Future _future;
   List<BachecaTile> posts = [];
-
-  @override
-  void initState()
-  {
-    super.initState();
-    _future = _fetchPosts();
-  }
 
   @override
   Widget build(BuildContext context)
@@ -35,12 +27,12 @@ class BachecaState extends State<Bacheca>
       {
         if (snapshot.connectionState == ConnectionState.waiting) 
         {
-          return const CircularProgressIndicator(); // Placeholder while loading
+          return Center(child: CircularProgressIndicator()); // Placeholder while loading
         } 
         
         if (snapshot.hasError) 
         {
-          return Text('Error: ${snapshot.error}');
+          return Center(child: Text('Error: ${snapshot.error}'));
         } 
          
         posts = snapshot.data!;
@@ -73,15 +65,7 @@ class BachecaState extends State<Bacheca>
         itemCount: posts.length,
         itemBuilder: (context, index)
         {
-          return BachecaTile
-          (
-            username: posts[index].username, 
-            date: posts[index].date, 
-            imagePath: posts[index].imagePath,
-            description: posts[index].description,
-            likes: posts[index].likes,
-            comments: posts[index].comments,
-          );
+          return posts[index];
         },
       )
     );
@@ -91,17 +75,30 @@ class BachecaState extends State<Bacheca>
   Future<List<BachecaTile>> _fetchPosts() async 
   {
     var response = await ApiManager.fetchData('post');
-    if (response != null) 
-    {
-      //response = response.replaceAll(' NaN,', '"NaN",');
-      var results = jsonDecode(response) as List?;
+    if (response == null) 
+      return [];
 
-      if (results != null) 
-      {
-       return results.map((elem) => BachecaTile.fromJson(elem)).toList().reversed.toList();
-      }
+    List<dynamic> posts = jsonDecode(response);
+    List<BachecaTile> result = List.empty(growable: true);
+    for(var post in posts)
+    {
+      String userdata = (await ApiManager.fetchData("profile/${post['creator']}/data"))!;
+      String profilepic = (json.decode(userdata))["profile_image_url"];
+      result.add
+      (
+        BachecaTile(
+          id: post['_id'],
+          username: post['creator'],
+          userimage: profilepic,
+          date: post['date'], 
+          imagePath: post['img_url'],
+          description: post['description'],
+          likers: post['like'],
+          comments: post['comments'],
+        )
+      );
     }
-    return [];
+    return result.reversed.toList();
   }
 
 }

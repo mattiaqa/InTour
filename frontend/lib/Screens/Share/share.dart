@@ -1,13 +1,8 @@
 import 'dart:io';
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/Screens/Common/appbar.dart';
-import 'package:frontend/utils/api_manager.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:http/http.dart' as http;
-import 'package:frontend/utils/constants.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class SharePage extends StatefulWidget {
   const SharePage({Key? key}) : super(key: key);
@@ -18,7 +13,7 @@ class SharePage extends StatefulWidget {
 
 class SharePageState extends State<SharePage> {
   TextEditingController descriptionController = TextEditingController();
-  File? selectedImage;
+  //File? selectedImage;
 
   @override
   Widget build(BuildContext context) {
@@ -63,10 +58,7 @@ class SharePageState extends State<SharePage> {
         await ImagePicker().pickImage(source: ImageSource.gallery);
 
     if (returnedImage == null) return;
-    setState(() {
-      selectedImage = File(returnedImage.path);
-    });
-    context.push('/sharepreview', extra: selectedImage);
+    context.push('/sharepreview', extra: File(returnedImage.path));
   }
 
   Future _PickImageFromCamera() async {
@@ -74,9 +66,6 @@ class SharePageState extends State<SharePage> {
         await ImagePicker().pickImage(source: ImageSource.camera);
 
     if (returnedImage == null) return;
-    setState(() {
-      selectedImage = File(returnedImage.path);
-    });
-    context.push('/sharepreview', extra: selectedImage);
+    context.push('/sharepreview', extra: File(returnedImage.path));
   }
 }

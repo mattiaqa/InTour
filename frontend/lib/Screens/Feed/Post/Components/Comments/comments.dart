@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/Screens/Feed/Post/Components/Comments/tile.dart';
-import 'package:frontend/Screens/Percorsi/percorso_tile.dart';
-import 'package:frontend/utils/api_manager.dart';
-import 'dart:convert';
 
 class Commenti extends StatefulWidget
 {
-  List<CommentoTile> commenti;
+  final List<CommentoTile> commenti;
   Commenti({super.key, required this.commenti});
   
   @override

@@ -59,8 +59,7 @@ def get_user_post(username):
     except Exception as e:
         current_app.logger.error("Internal Server Error: %s", e)
         return jsonify({"Error": "Internal Server Error"}), 500
-    
-
+ 
 @bp.route('/profile/edit/description', methods=['POST'])
 @jwt_required()
 def edit_profile_description():
@@ -155,7 +154,7 @@ def search_user():
 
         users = mongo['users'].find(
             {"_id": {"$regex": regex_pattern, "$options": "i"}},
-            {"password": 0, "friends_request": 0, "friends_pending": 0}
+            {"_id": 1}
             )
 
         for user in users:

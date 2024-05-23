@@ -1,50 +1,48 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/Screens/Feed/Post/Components/Comments/tile.dart';
 import 'package:frontend/Screens/Feed/Post/Components/like.dart';
 import 'package:frontend/Screens/Feed/Post/Components/user.dart';
+import 'package:frontend/utils/app_service.dart';
 import 'package:frontend/utils/constants.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
-class BachecaTile extends StatelessWidget {
+// ignore: must_be_immutable
+class BachecaTile extends StatefulWidget {
+  String id;
   String? username;
+  String? userimage;
   String? date;
   String? description;
   String imagePath;
-  List<CommentoTile>? comments;
-  int? likes;
-
-  void Function()? onTap;
+  List<dynamic>? comments;
+  List<dynamic>? likers;
 
   BachecaTile
   ({
+    required this.id,
     required this.username,
+    required this.userimage,
     required this.date,
     required this.imagePath,
     this.description,
     this.comments,
-    this.likes,
-    this.onTap,
+    this.likers,
   });
 
-  factory BachecaTile.fromJson(Map<String, dynamic> json) {
-    List<dynamic> commentiJson = json['comments'];
+  BachecaTileState createState() => BachecaTileState();
+}
 
-    List<CommentoTile> commentiList = [];
-    for (var item in commentiJson) {
-      commentiList.add(CommentoTile.fromJson(item));
-    }
+class BachecaTileState extends State<BachecaTile>
+{
+  late bool liked;
+  late int likecount;
 
-    return BachecaTile(
-      username: json['creator'] ?? '',
-      date: json['date'] ?? '',
-      imagePath: json['img_url'] ?? '',
-      description: json['description'] ?? '',
-      comments: commentiList,
-      likes: json['like'] ?? '',
-    );
+  @override
+  void initState() {
+    liked = widget.likers!.contains(AppService.instance.currentUser!.userid);
+    likecount =  widget.likers!.length;
+    super.initState();
   }
-
   @override
   Widget build(BuildContext context) 
   {
@@ -64,14 +62,15 @@ class BachecaTile extends StatelessWidget {
         [
           TinyProfile
           (
-            username: username!,
-            date: formatDateToRelative(date!),
+            username: widget.username!,
+            date: formatDateToRelative(widget.date!),
+            image: widget.userimage!
           ),
           Container //SizedBox
           (
             //height: 300,
             //width: 300,
-            child: Image.network("http://$myIP:8000/api" + imagePath),
+            child: Image.network("http://$myIP:8000/api" + widget.imagePath),
           ),
           SizedBox(height: 8,),
           Row
@@ -85,7 +84,19 @@ class BachecaTile extends StatelessWidget {
                   //mainAxisAlignment: MainAxisAlignment.end,
                   children:
                   [
-                    LikeButton(liked: false),
+                    LikeButton
+                    (
+                      liked: liked,
+                      postId: widget.id,
+                      onTap: () 
+                      {
+                        setState(() {
+                          likecount += liked ? -1 : 1;
+                          liked = !liked;
+                        });
+                      }
+                    ),
+                    
                     const VerticalDivider
                     (
                       width: 20,
@@ -99,7 +110,7 @@ class BachecaTile extends StatelessWidget {
                       ),
                       onTap: () 
                       {
-                        context.push('/comments', extra: comments);
+                        context.push('/comments', extra: widget.comments);
                       },
                     ),
                   ],
@@ -109,13 +120,13 @@ class BachecaTile extends StatelessWidget {
           ),
           Text
           (
-            '$likes Mi piace', 
+            likecount.toString() + ' Mi piace', 
             style: TextStyle
             (
               fontWeight: FontWeight.w600
             ),
           ),
-          Text("$description"),
+          Text("${widget.description}"),
           Divider(height: 20, thickness: 0.4,)
         ],
       )

@@ -1,13 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/utils/api_manager.dart';
 
+// ignore: must_be_immutable
 class LikeButton extends StatefulWidget
 {
   bool liked;
+  String postId;
+  VoidCallback? onTap;
 
   LikeButton
   (
     {
       required this.liked,
+      required this.postId,
+      this.onTap,
     }
   );
 
@@ -24,8 +30,6 @@ class LikeButtonState extends State<LikeButton>
     vsync: this, 
     value: 1.0,
   );
-
-  bool _isFavorite = false;
 
   @override
   void dispose() 
@@ -61,10 +65,26 @@ class LikeButtonState extends State<LikeButton>
     
       onTap: ()
       {
+        Map<String, dynamic> postdata = {
+          'post_id': widget.postId,
+        };
+
+        if(widget.liked)
+        {
+          ApiManager.postData('post/dislike', postdata);
+        }
+        else
+        {
+          ApiManager.postData('post/like', postdata);
+        }
+
         setState(() {
           widget.liked = !widget.liked;
         });
         _controller.reverse().then((value) => _controller.forward());
+
+        if(widget.onTap != null)
+          widget.onTap!();
       }
     );
   }

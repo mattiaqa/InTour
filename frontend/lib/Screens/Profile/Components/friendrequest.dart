@@ -1,81 +1,113 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:frontend/utils/api_manager.dart';
 import 'package:frontend/utils/app_service.dart';
 
-class FirendRequestButton extends StatefulWidget
-{
+enum FriendshipState {
+  sameUser,
+  strangers,
+  requestSent,
+  requestRecieved,
+  friends
+}
+
+// ignore: must_be_immutable
+class FirendRequestButton extends StatefulWidget {
   String username;
-  FirendRequestButton
-  (
-    {
-      super.key,
-      required this.username
-    }
-  );
+  List<dynamic> friends;
+  List<dynamic> friends_pending;
+  List<dynamic> friends_request;
+  VoidCallback onTap;
+
+  FirendRequestButton({
+    super.key, 
+    required this.username,
+    required this.friends,
+    required this.friends_pending,
+    required this.friends_request,
+    required this.onTap
+  });
 
   @override
   FriendRequestButtonState createState() => FriendRequestButtonState();
 }
 
-class FriendRequestButtonState extends State<FirendRequestButton>
-{
+class FriendRequestButtonState extends State<FirendRequestButton> {
+  late FriendshipState status;
+
   @override
-  Widget build(BuildContext context)
-  {
+  void initState() {
+    status = friendStatus();
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return SizedBox
     (
       height: 30,
       width: 200,
-      child: (widget.username == AppService.instance.currentUser!.userid) ? 
-        ElevatedButton
-        (
-          onPressed: () {},
-          child: Text("Modifica")
-        )
-        :
-        ElevatedButton
-        (
-          onPressed: () 
-          {
-            Map<String, dynamic> frienddata = {
-              'username': widget.username,
-            };
+      child: (status == FriendshipState.sameUser)
+          ? ElevatedButton(onPressed: () {}, child: Text("Modifica"))
+          : ElevatedButton(
+              onPressed: () {
+                Map<String, dynamic> frienddata = {
+                  'username': widget.username,
+                };
 
-            if(areFriends())
-            {  
-              ApiManager.postData('friends/remove', frienddata).then
-              (
-                (value)
-                {
-                  setState(() {
-                    
-                  });
+                if (status == FriendshipState.friends) {
+                  ApiManager.postData('friends/remove', frienddata)
+                      .then((value) => widget.onTap());
                 }
-              );
-            }
-            else
-            {
-              ApiManager.postData('friends/add', frienddata).then((value) => setState(() {
-                
-              }));
-            }
-          },
-          child: areFriends() ? 
-            Text("Rimuovi amicizia")
-            :
-            Text("Richiesta amico")
-        )
+                else if (status == FriendshipState.requestRecieved) {
+                  ApiManager.postData('friends/accept', frienddata)
+                      .then((value) => widget.onTap());
+                } 
+                else if (status == FriendshipState.requestSent) {
+
+                } 
+                else if (status == FriendshipState.strangers)
+                {
+                  ApiManager.postData('friends/request', frienddata)
+                      .then((value) => widget.onTap());
+                }
+              },
+              child: Text(buttonText(status))
+            )
     );
   }
 
-  bool areFriends()
+  FriendshipState friendStatus()
   {
-    if(AppService.instance.currentUser!.friends == null)
-      return false;
+    String currentUser = AppService.instance.currentUser!.userid!;
 
-    return AppService.instance.currentUser!.friends!.contains(widget.username);
+    if ((widget.username == currentUser))
+      return FriendshipState.sameUser;
+    
+    if (widget.friends.contains(currentUser)) 
+      return FriendshipState.friends;
+    
+    if (widget.friends_request.contains(currentUser))
+      return FriendshipState.requestSent;
+    
+    if (widget.friends_pending.contains(currentUser))
+      return FriendshipState.requestRecieved;
+    
+    return FriendshipState.strangers;
+  }
+
+  String buttonText(FriendshipState status)
+  {
+    switch (status) {
+      case FriendshipState.friends:
+        return "Rimuovi amicizia";
+      case FriendshipState.requestRecieved:
+        return "Accetta amicizia";
+      case FriendshipState.requestSent:
+        return "Richiesta iniviata";
+      case FriendshipState.strangers:
+        return "Aggiungi amico";
+      default:
+        return "Errore";
+    }
   }
 }

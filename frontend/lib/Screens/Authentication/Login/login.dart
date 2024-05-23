@@ -86,7 +86,7 @@ class LoginPageState extends State<LoginPage> {
             userController.text.toString(), passwordController.text.toString())
         .then((value) {
       if (value) {
-        _fetchUser().then((user) {
+        _fetchUser(userController.text).then((user) {
           if (user != null) {
             AppService.instance.setUserData(user);
             context.go('/home');
@@ -105,9 +105,9 @@ class LoginPageState extends State<LoginPage> {
   }
 }
 
-Future<Profile_Data?> _fetchUser() async {
+Future<Profile_Data?> _fetchUser(String user) async {
   try {
-    final response = await ApiManager.fetchData('profile/data');
+    final response = await ApiManager.fetchData('profile/$user/data');
     if (response != null) {
       print(json.decode(response));
       final results = json.decode(response);

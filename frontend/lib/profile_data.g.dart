@@ -22,6 +22,8 @@ class ProfileDataAdapter extends TypeAdapter<Profile_Data> {
       email: fields[2] as String?,
       name: fields[3] as String?,
       friends: (fields[5] as List?)?.cast<String>(),
+      friends_request: (fields[6] as List?)?.cast<String>(),
+      friends_pending: (fields[7] as List?)?.cast<String>(),
     );
   }
 
@@ -38,6 +40,10 @@ class ProfileDataAdapter extends TypeAdapter<Profile_Data> {
       ..writeByte(3)
       ..write(obj.name)
       ..writeByte(5)
+      ..write(obj.friends)
+      ..writeByte(6)
+      ..write(obj.friends)
+      ..writeByte(7)
       ..write(obj.friends);
   }
 
