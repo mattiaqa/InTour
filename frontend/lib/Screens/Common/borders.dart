@@ -94,12 +94,21 @@ class PageBordersState extends State<PageBorders> {
             },
             selectedIndex: selectedIndex,
             destinations: [
-              NavigationDestination(
-                  label: 'Percorsi', icon: Icon(Icons.navigation_rounded)),
-              NavigationDestination(
-                label: 'Bacheca', icon: Icon(Icons.home)),
-              NavigationDestination(
-                  label: 'Pubblica', icon: Icon(Icons.photo_camera_back_outlined)),
+              NavigationDestination
+              (
+                label: 'Percorsi', 
+                icon: Icon(Icons.navigation_rounded)
+              ),
+              NavigationDestination
+              (
+                label: 'Bacheca', 
+                icon: Icon(Icons.home)
+              ),
+              NavigationDestination
+              (
+                label: 'Pubblica', 
+                icon: Icon(Icons.local_see_rounded)
+              ),
               NavigationDestination(
                   label: 'Profilo', 
                   icon: Stack

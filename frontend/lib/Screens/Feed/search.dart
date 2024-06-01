@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:frontend/Screens/Common/appbar.dart';
+import 'package:frontend/Screens/Common/emptyState.dart';
 import 'package:frontend/Screens/Profile/Components/profilepic.dart';
 import 'package:frontend/utils/api_manager.dart';
 import 'package:go_router/go_router.dart';
@@ -55,22 +56,29 @@ class SearchUserPageState extends State<SearchUserPage>
 
             Expanded
             (
-              child: ListView.builder(
-                itemCount: _searchResults.length,
-                itemBuilder: (context, index) {
-                  return ListTile(
-                    leading: ProfilePic
-                    (
-                      imagePath: _searchResults[index].imagePath!,
-                      radius: 20,
-                    ),
-                    title: Text(_searchResults[index].username),
-                    onTap: () {
-                      context.push('/profilo', extra: _searchResults[index]);
-                    },
-                  );
-                },
-              )
+              child: _searchResults.isNotEmpty ?
+                ListView.builder(
+                  itemCount: _searchResults.length,
+                  itemBuilder: (context, index) {
+                    return ListTile(
+                      leading: ProfilePic
+                      (
+                        imagePath: _searchResults[index].imagePath!,
+                        radius: 20,
+                      ),
+                      title: Text(_searchResults[index].username),
+                      onTap: () {
+                        context.push('/profilo', extra: _searchResults[index].username);
+                      },
+                    );
+                  },
+                )
+                :
+                EmptyState
+                (
+                  icon: Icons.search_off_rounded,
+                  message: 'Nessun utente trovato',
+                )
             ),
           ],
         ),
