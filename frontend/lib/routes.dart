@@ -6,6 +6,7 @@ import 'package:frontend/Screens/Feed/Post/Components/Comments/tile.dart';
 import 'package:frontend/Screens/Authentication/Login/login.dart';
 import 'package:frontend/Screens/Authentication/Register/register.dart';
 import 'package:frontend/Screens/Feed/search.dart';
+import 'package:frontend/Screens/Map/presentation/map_page.dart';
 import 'package:frontend/Screens/Percorsi/dettagli_percorso.dart';
 import 'package:frontend/Screens/Authentication/Register/success.dart';
 import 'package:frontend/Screens/Common/borders.dart';
@@ -19,9 +20,7 @@ import 'package:go_router/go_router.dart';
 var router =
     GoRouter(initialLocation: '/home', redirect: _redirect, routes: <GoRoute>[
   GoRoute(
-      name: 'Login', 
-      path: '/login',
-       builder: (context, state) => LoginPage()),
+      name: 'Login', path: '/login', builder: (context, state) => LoginPage()),
   GoRoute(
       name: 'Register',
       path: '/register',
@@ -30,7 +29,6 @@ var router =
       name: 'RegisterSuccess',
       path: '/success',
       builder: (context, state) => RegisterSuccessPage()),
-  
   GoRoute(
     name: 'Home',
     path: '/home',
@@ -42,56 +40,59 @@ var router =
     builder: (context, state) =>
         DettagliPercorso(percorso: state.extra as Percorso),
   ),
-
   GoRoute(
     name: 'Post comments',
     path: '/comments',
     builder: (context, state) =>
         Commenti(commenti: state.extra as List<CommentoTile>),
   ),
-  
   GoRoute(
-    name: 'Profilo',
-    path: '/profilo',
-    builder: (context, state) => ProfiloPage(username: state.extra as String,)),
+      name: 'Profilo',
+      path: '/profilo',
+      builder: (context, state) => ProfiloPage(
+            username: state.extra as String,
+          )),
   GoRoute(
-    name: 'ProfiloUtente',
-    path: '/userprofile',
-    builder: (context, state) 
-    {
-      return PageBorders(selectedIndex: 3, username: state.extra as String,); 
-    }
-  ),
+      name: 'ProfiloUtente',
+      path: '/userprofile',
+      builder: (context, state) {
+        return PageBorders(
+          selectedIndex: 3,
+          username: state.extra as String,
+        );
+      }),
   GoRoute(
     name: 'Share',
     path: '/share',
-    builder: (context, state) => SharePage()),
+    builder: (context, state) => SharePage(),
+  ),
   GoRoute(
-    name: 'SharePreview',
-    path: '/sharepreview',
-    builder: (context, state) => SharePreviewPage(image: state.extra as File)),
+    name: 'Map',
+    path: '/map',
+    builder: (context, state) => MapPage(),
+  ),
   GoRoute(
-    name: 'ShareSuccess',
-    path: '/sharesuccess',
-    builder: (context, state) => ShareSuccessPage()),
-  
+      name: 'SharePreview',
+      path: '/sharepreview',
+      builder: (context, state) =>
+          SharePreviewPage(image: state.extra as File)),
   GoRoute(
-    name: 'Feed',
-    path: '/feed',
-    builder: (context, state) => Bacheca()),
+      name: 'ShareSuccess',
+      path: '/sharesuccess',
+      builder: (context, state) => ShareSuccessPage()),
+  GoRoute(name: 'Feed', path: '/feed', builder: (context, state) => Bacheca()),
   GoRoute(
-    name: 'SearchUser',
-    path: '/searchuser',
-    builder: (context, state) => SearchUserPage()),
-  
-
+      name: 'SearchUser',
+      path: '/searchuser',
+      builder: (context, state) => SearchUserPage()),
 ]);
 
 String? _redirect(BuildContext context, GoRouterState state) {
   final isLoggedIn = AppService.instance.isLoggedIn;
   final isLoginRoute = state.matchedLocation == LoginPage.route;
 
-  if (state.matchedLocation == '/register' || state.matchedLocation == '/success') return null;
+  if (state.matchedLocation == '/register' ||
+      state.matchedLocation == '/success') return null;
 
   if (!isLoggedIn && !isLoginRoute) {
     return LoginPage.route;

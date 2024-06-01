@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/profile_data.dart';
@@ -21,64 +20,90 @@ class LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-            //title: Text("InTour"),
+      body: Form(
+        child: AutofillGroup(
+          child: Center(
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 30),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Center(
+                      child: Image.asset(
+                        'assets/images/InTour_logo.png',
+                        height: 100,
+                      ),
+                    ),
+                    SizedBox(height: 20),
+                    Text(
+                      "InTour",
+                      textAlign: TextAlign.center,
+                      style:
+                          TextStyle(fontSize: 40, fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(height: 50),
+                    TextField(
+                      controller: userController,
+                      decoration: InputDecoration(
+                        prefixIcon: Icon(Icons.person),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        hintText: "Username",
+                      ),
+                    ),
+                    SizedBox(height: 20),
+                    TextField(
+                      controller: passwordController,
+                      obscureText: true,
+                      decoration: InputDecoration(
+                        prefixIcon: Icon(Icons.lock),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        hintText: "Password",
+                      ),
+                    ),
+                    SizedBox(height: 30),
+                    ElevatedButton(
+                      child: Text("Login"),
+                      onPressed: () => tryLogin(context),
+                      style: ElevatedButton.styleFrom(
+                        padding: EdgeInsets.symmetric(vertical: 15),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 20),
+                    RichText(
+                      textAlign: TextAlign.center,
+                      text: TextSpan(
+                        children: [
+                          TextSpan(
+                            text: "Non hai un account? ",
+                            style: TextStyle(color: Colors.black),
+                          ),
+                          TextSpan(
+                            text: "Registrati",
+                            style: TextStyle(color: Colors.blue),
+                            recognizer: TapGestureRecognizer()
+                              ..onTap =
+                                  () => GoRouter.of(context).go("/register"),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
-        body: Form(
-            child: AutofillGroup(
-                child: SingleChildScrollView(
-          child: Column(
-            children: [
-              Padding(
-                padding: EdgeInsets.all(50),
-                child: Text(
-                  "InTour",
-                  style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold),
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.all(20),
-                child: TextField(
-                  controller: userController,
-                  decoration: InputDecoration(
-                    hintText: "Username",
-                  ),
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.all(20),
-                child: TextField(
-                  controller: passwordController,
-                  obscureText: true,
-                  decoration: InputDecoration(
-                    hintText: "Password",
-                  ),
-                ),
-              ),
-              Padding(
-                  padding: EdgeInsets.all(20),
-                  child: ElevatedButton(
-                    child: Text("Login"),
-                    onPressed: () => tryLogin(context),
-                  )),
-              Padding(
-                  padding: EdgeInsets.all(20),
-                  child: RichText(
-                    text: TextSpan(children: [
-                      TextSpan(
-                          text: "Non hai un account? ",
-                          style: TextStyle(color: Colors.black)),
-                      TextSpan(
-                        text: "Registrati",
-                        style: TextStyle(color: Colors.blue),
-                        recognizer: TapGestureRecognizer()
-                          ..onTap = () => GoRouter.of(context).go("/register"),
-                      )
-                    ]),
-                  ))
-            ],
           ),
-        ))));
+        ),
+      ),
+    );
   }
 
   void tryLogin(BuildContext context) {
@@ -90,16 +115,19 @@ class LoginPageState extends State<LoginPage> {
           if (user != null) {
             AppService.instance.setUserData(user);
             context.go('/home');
-          } else {}
+          } else {
+            // Gestione errore utente non trovato
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Utente non trovato')),
+            );
+          }
         });
       } else {
-        /*setState(() {
-            borderColor = Color.fromARGB(255, 255, 0, 0);
-            errorText = "Email o password errati";
-            loginFailed = true;
-
-            passwordController.clear();
-          });*/
+        // Gestione errore login fallito
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Email o password errati')),
+        );
+        passwordController.clear();
       }
     });
   }

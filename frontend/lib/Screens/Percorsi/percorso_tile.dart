@@ -1,52 +1,73 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/utils/constants.dart';
 
 // ignore: must_be_immutable
-class PercorsoTile extends StatelessWidget 
-{
+class PercorsoTile extends StatelessWidget {
   String? title;
   String? category;
   String? startpoint;
+  String? imageUrl;
 
   void Function()? onTap;
 
-  PercorsoTile
-  ({
+  PercorsoTile({
     required this.title,
     required this.category,
     required this.startpoint,
+    this.imageUrl,
     this.onTap,
   });
 
-  factory PercorsoTile.fromJson(Map<String, dynamic> json)
-  {
-    return PercorsoTile
-    (
-      title: json['title'] ?? '',
-      category: json['category'] ?? '',
-      startpoint: json['startpoint'] ?? '',
-    );
+  factory PercorsoTile.fromJson(Map<String, dynamic> json) {
+    return PercorsoTile(
+        title: json['title'] ?? '',
+        category: json['category'] ?? '',
+        startpoint: json['startpoint'] ?? '');
   }
 
   @override
-  Widget build(BuildContext context)
-  {
-    return Card
-    (
-      margin: EdgeInsets.all(8.0),
-      color: Color.fromARGB(255, 242, 239, 239),
-      shape: RoundedRectangleBorder
-      (
-        borderRadius: BorderRadius.circular(10.0),
-      ),
-      child: ListTile
-      (
-        isThreeLine: true,
-        title: Text(title!),
-        subtitle: Text
-        (
-          '$startpoint\n$category',
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(15),
+      child: Card(
+        elevation: 5,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15),
         ),
-        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(15),
+                child: Image.network(
+                  "http://$myIP:8000/api/uploads/test/image.jpg",
+                  width: double.infinity,
+                  height: 200,
+                  fit: BoxFit.cover,
+                ),
+              ),
+              SizedBox(height: 16),
+              Text(
+                title!,
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              SizedBox(height: 8),
+              Text(
+                startpoint!,
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.grey[600],
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

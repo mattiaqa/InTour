@@ -1,22 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/Screens/Percorsi/header_percorso.dart';
+import 'package:frontend/utils/constants.dart';
 
-class Percorso
-{
-  String? category, description, startpoint, endpoint, 
-    security, summary, tips, title;
+class Percorso {
+  String? category,
+      description,
+      startpoint,
+      endpoint,
+      security,
+      summary,
+      tips,
+      title,
+      imageUrl;
 
-  Percorso({this. category, this. description, this.startpoint,
-    this.endpoint, this.security, this.summary, this.tips, this.title});  
-  
-  factory Percorso.fromJson(Map<String, dynamic> json)
-  {
-    return Percorso
-    (
+  Percorso(
+      {this.category,
+      this.description,
+      this.startpoint,
+      this.endpoint,
+      this.security,
+      this.summary,
+      this.tips,
+      this.title,
+      this.imageUrl});
+
+  factory Percorso.fromJson(Map<String, dynamic> json) {
+    return Percorso(
       title: json['title'] ?? '',
       category: json['category'] ?? '',
       startpoint: json['startpoint'] ?? '',
-      endpoint: json['startpoint'] ?? '',
+      endpoint: json['endpoint'] ?? '',
       description: json['description'] ?? '',
       security: json['security'] ?? '',
       summary: json['summary'] ?? '',
@@ -24,11 +37,22 @@ class Percorso
     );
   }
 
+  Map<String, dynamic> toJson() {
+    return {
+      'title': title ?? '',
+      'category': category ?? '',
+      'startpoint': startpoint ?? '',
+      'endpoint': endpoint ?? '',
+      'description': description ?? '',
+      'security': security ?? '',
+      'summary': summary ?? '',
+      'tips': tips ?? ''
+    };
+  }
 }
 
 // ignore: must_be_immutable
-class DettagliPercorso extends StatefulWidget
-{
+class DettagliPercorso extends StatefulWidget {
   Percorso percorso;
 
   DettagliPercorso({super.key, required this.percorso});
@@ -37,82 +61,94 @@ class DettagliPercorso extends StatefulWidget
   State<DettagliPercorso> createState() => DettagliPercorsoState();
 }
 
-class DettagliPercorsoState extends State<DettagliPercorso>
-{
+class DettagliPercorsoState extends State<DettagliPercorso> {
   @override
-  Widget build(BuildContext context)
-  {
-    return Scaffold
-    (
+  Widget build(BuildContext context) {
+    return Scaffold(
       appBar: AppBar(title: Text("Dettagli percorso")),
-      body: CustomScrollView
-      (
-        slivers: 
-        [
-          SliverPersistentHeader
-          (
+      body: CustomScrollView(
+        slivers: [
+          SliverPersistentHeader(
             pinned: true,
             floating: false,
             delegate: PercorsoHeader(
-            minHeight: 60.0,
-            maxHeight: 200.0,
-            child: Container
-            (
-              color: Colors.lightBlue, child: Center(child: Text(widget.percorso.title.toString()))
+              minHeight: 60.0,
+              maxHeight: 200.0,
+              child: Image.network(
+                "http://$myIP:8000/api/uploads/test/image.jpg",
+                fit: BoxFit.cover,
+              ),
             ),
-      ),
           ),
-
-          
-        ],
-
-        /*
-        child: Column
-        (
-          children: 
-          [
-            Text(widget.percorso.title.toString(), semanticsLabel: 'Nome',),
-            Text(widget.percorso.category.toString(), semanticsLabel: 'Categoria',),
-            Text(widget.percorso.startpoint.toString(), semanticsLabel: 'Inizio',),
-            Text(widget.percorso.endpoint.toString(), semanticsLabel: 'Fine',),
-            Text(widget.percorso.description.toString(), semanticsLabel: 'Descrizione',),
-            Text(widget.percorso.summary.toString(), semanticsLabel: 'Riassunto',),
-            Text(widget.percorso.security.toString(), semanticsLabel: 'Sicurezza',),
-            Text(widget.percorso.tips.toString(), semanticsLabel: 'Consigli',),
-          ].map
-          ((elem) =>
-            Column
-            (
-              children:
-              [
-                Padding
-                ( 
-                  padding: EdgeInsets.fromLTRB(10, 10, 10, 0),
-                  child: Center
-                  (
-                    child: Container
-                    (
-                      child: InputDecorator
-                      (
-                        decoration: InputDecoration
-                        (
-                          labelText: elem.semanticsLabel,
-                          border: OutlineInputBorder
-                          (
-                            borderRadius: BorderRadius.circular(10),
-                          )
-                        ),
-                        child: elem,
+          SliverToBoxAdapter(
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      ListTile(
+                        leading: Icon(Icons.title),
+                        title: Text(widget.percorso.title.toString(),
+                            semanticsLabel: 'Nome',
+                            style: TextStyle(
+                                fontSize: 20, fontWeight: FontWeight.bold)),
                       ),
-                    ),
+                      ListTile(
+                        leading: Icon(Icons.category),
+                        title: Text(
+                            "Categoria: ${widget.percorso.category.toString()}",
+                            semanticsLabel: 'Categoria'),
+                      ),
+                      ListTile(
+                        leading: Icon(Icons.location_on),
+                        title: Text(
+                            "Inizio: ${widget.percorso.startpoint.toString()}",
+                            semanticsLabel: 'Inizio'),
+                      ),
+                      ListTile(
+                        leading: Icon(Icons.location_on),
+                        title: Text(
+                            "Fine: ${widget.percorso.endpoint.toString()}",
+                            semanticsLabel: 'Fine'),
+                      ),
+                      ListTile(
+                        leading: Icon(Icons.description),
+                        title: Text(
+                            "Descrizione: ${widget.percorso.description.toString()}",
+                            semanticsLabel: 'Descrizione'),
+                      ),
+                      ListTile(
+                        leading: Icon(Icons.abc),
+                        title: Text(
+                            "Riassunto: ${widget.percorso.summary.toString()}",
+                            semanticsLabel: 'Riassunto'),
+                      ),
+                      ListTile(
+                        leading: Icon(Icons.security),
+                        title: Text(
+                            "Sicurezza: ${widget.percorso.security.toString()}",
+                            semanticsLabel: 'Sicurezza'),
+                      ),
+                      ListTile(
+                        leading: Icon(Icons.tips_and_updates),
+                        title: Text(
+                            "Consigli: ${widget.percorso.tips.toString()}",
+                            semanticsLabel: 'Consigli'),
+                      ),
+                      SizedBox(height: 20),
+                      if (widget.percorso.imageUrl != null &&
+                          widget.percorso.imageUrl!.isNotEmpty)
+                        Image.network(widget.percorso.imageUrl!),
+                    ],
                   ),
                 ),
-                Divider(height: 30,),
-              ]
-            )
-          ).toList()
-        ),*/
-      )
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
