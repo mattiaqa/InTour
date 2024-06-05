@@ -130,7 +130,10 @@ class _ProfiloPage extends State<ProfiloPage> {
                           ProfileData
                           (
                             posts: userPosts.length,
-                            friends: userData['friends'].length
+                            clickable: widget.username == AppService.instance.currentUser!.userid,
+                            friends: userData['friends'],
+                            friends_pending: userData['friends_pending'],
+                            friends_requests: userData['friends_request'],
                           ),
 
                           SizedBox(height: 20),
