@@ -30,6 +30,35 @@ def get_user_data(username):
         current_app.logger.error("Internal Server Error: %s", e)
         return jsonify({"Error": "Internal Server Error"}), 500
 
+
+@bp.route('/profile/<username>/profile_image', methods=['GET'])
+@jwt_required()
+def get_user_profile_image(username):
+    """
+        Retrive all the data of the current user.
+
+        Returns:
+        - If successful, returns a JSON list with all user data
+          and an HTTP status code of 200.
+        - If any exceptions occur during the process, 
+          logs an internal server error and returns a JSON response with 
+          an error message ({'Error': 'Internal Server Error'}) 
+          and an HTTP status code of 500.
+    """
+    try:
+        user = username
+
+        user_data = mongo['users'].find_one({'_id': user}, {'password': 0})
+
+        if not user_data:
+            return jsonify(), 404
+
+        return jsonify(user_data['profile_image_url']), 200
+    except Exception as e:
+        current_app.logger.error("Internal Server Error: %s", e)
+        return jsonify({"Error": "Internal Server Error"}), 500
+
+
 @bp.route('/profile/<username>/posts', methods=['GET'])
 @jwt_required()
 def get_user_post(username):
