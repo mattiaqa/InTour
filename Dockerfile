@@ -24,7 +24,7 @@ EXPOSE 5000
 
 WORKDIR /src
 
-ADD datasets/sentieri-storico-culturali.xls /assets/datasets/
+ADD datasets/ /assets/datasets/
 
 COPY backend/ .
 

@@ -5,6 +5,7 @@ from app.extension import mongo
 import os 
 from bson import ObjectId
 import re
+from app.utils import isFriendOf
 
 @bp.route('/profile/<username>/data', methods=['GET'])
 @jwt_required()
@@ -21,9 +22,7 @@ def get_user_data(username):
           and an HTTP status code of 500.
     """
     try:
-        user = username
-
-        user_data = mongo['users'].find_one({'_id': user}, {'password': 0})
+        user_data = mongo['users'].find_one({'_id': username}, {'password': 0})
 
         return jsonify(user_data), 200
     except Exception as e:
@@ -46,12 +45,10 @@ def get_user_profile_image(username):
           and an HTTP status code of 500.
     """
     try:
-        user = username
-
-        user_data = mongo['users'].find_one({'_id': user}, {'password': 0})
+        user_data = mongo['users'].find_one({'_id': username}, {'password': 0})
 
         if not user_data:
-            return jsonify(), 404
+            return jsonify({"Error":"No data found"}), 404
 
         return jsonify(user_data['profile_image_url']), 200
     except Exception as e:
@@ -74,9 +71,13 @@ def get_user_post(username):
           and an HTTP status code of 500.
     """
     try:
-        user = username
+        current_user = get_jwt_identity()['username']
 
-        posts = mongo['posts'].find({'creator':user})
+        if(not isFriendOf(username, current_user)):
+            return jsonify({"Error":"Unauthorized"}), 403
+            
+
+        posts = mongo['posts'].find({'creator' : username})
 
         result = []
         for post in posts:
@@ -127,6 +128,21 @@ def edit_profile_description():
 @bp.route('/profile/edit/image', methods=['POST'])
 @jwt_required()
 def edit_profile_image():
+    """
+        Give the possibility to edit the profile image of the current user.
+
+        Parameters:
+        - file: image to be uploaded.
+
+        Returns:
+        - If successful, returns a JSON response with a status of success
+          and an HTTP status code of 200.
+        - If any exceptions occur during the process, 
+          logs an internal server error and returns a JSON response with 
+          an error message ({'Error': 'Internal Server Error'}) 
+          and an HTTP status code of 500.
+        - If a file with no filename is uploaded, returns 400 error code.
+    """
     try:
         if 'file' not in request.files:
             return jsonify({'error': 'No file found'}), 400
@@ -144,9 +160,6 @@ def edit_profile_image():
 
         # create a new ObjectId to use in mongodb
         object_id = ObjectId()
-
-        # use of the ObjectId as the file name
-        #file_name = str(object_id) + '.jpg'
 
         # if current user' directory does not exists, create new one
         upload_folder = f'/src/backend/static/uploads/{user}'
@@ -174,7 +187,22 @@ def edit_profile_image():
     
 
 @bp.route('/profile/search', methods=['POST'])
+@jwt_required()
 def search_user():
+    """
+        Search for a user.
+
+        Parameters:
+        - query: name of the user to be searched.
+
+        Returns:
+        - If successful, returns a JSON response with a status of success
+          and an HTTP status code of 200.
+        - If any exceptions occur during the process, 
+          logs an internal server error and returns a JSON response with 
+          an error message ({'Error': 'Internal Server Error'}) 
+          and an HTTP status code of 500.
+    """
     try:
         query = request.json['query']
 
@@ -199,6 +227,17 @@ def search_user():
 @bp.route('/profile/remove/image', methods=['POST'])
 @jwt_required()
 def remove_profile_image():
+    """
+        Give the possibility to remove the profile image of the current user.
+
+        Returns:
+        - If successful, returns a JSON response with a status of success
+          and an HTTP status code of 200.
+        - If any exceptions occur during the process, 
+          logs an internal server error and returns a JSON response with 
+          an error message ({'Error': 'Internal Server Error'}) 
+          and an HTTP status code of 500.
+    """
     try:
         user = get_jwt_identity()['username']
 

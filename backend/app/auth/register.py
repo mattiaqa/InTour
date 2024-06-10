@@ -1,6 +1,5 @@
 import bcrypt
 from pymongo.errors import DuplicateKeyError
-import re
 from app.auth import bp 
 from flask import jsonify, request, current_app
 from app.extension import mongo
@@ -14,9 +13,6 @@ def register():
         surname = request.json['surname']
         birthdate = request.json['birthdate']
         password = request.json['password'].encode('utf-8')
-
-        if re.search(r'\.\./|/\./|//', username):
-            return jsonify({"Error": "Invalid username"}), 400
 
         salt = bcrypt.gensalt()
         password = bcrypt.hashpw(password, salt)
