@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:frontend/Screens/Common/appbar.dart';
+import 'package:frontend/Screens/Common/emptyState.dart';
 import 'package:frontend/Screens/Feed/Post/post.dart';
 import 'package:frontend/utils/api_manager.dart';
 import 'package:go_router/go_router.dart';
@@ -26,14 +27,9 @@ class BachecaState extends State<Bacheca>
       builder: (context, snapshot)
       {
         if (snapshot.connectionState == ConnectionState.waiting) 
-        {
-          return Center(child: CircularProgressIndicator()); // Placeholder while loading
-        } 
-        
+          return Scaffold(body: Center(child: CircularProgressIndicator())); // Placeholder while loading
         if (snapshot.hasError) 
-        {
-          return Center(child: Text('Error: ${snapshot.error}'));
-        } 
+          return Scaffold(body:Center(child: Text('Error: ${snapshot.error}')));
          
         posts = snapshot.data!;
         return _buildUI(); // Build the UI using fetched data
@@ -52,22 +48,23 @@ class BachecaState extends State<Bacheca>
         [
           IconButton
           (
-            icon: Icon(Icons.search_rounded),
-            onPressed: ()
-            {
-              context.push('/searchuser');
-            },
+            icon: Icon(Icons.person_search_rounded),
+            onPressed: () => context.push('/searchuser')
           )
         ],
       ),
-      body: ListView.builder
-      (
-        itemCount: posts.length,
-        itemBuilder: (context, index)
-        {
-          return posts[index];
-        },
-      )
+      body: posts.isNotEmpty ? 
+        ListView.builder
+        (
+          itemCount: posts.length,
+          itemBuilder: (context, index) => posts[index]
+        )
+        :
+        EmptyState
+        (
+          icon: Icons.landscape_rounded,
+          message: 'Ancora nessun post',
+        )
     );
     
   }

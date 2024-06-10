@@ -1,17 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 // ignore: must_be_immutable
 class ProfileData extends StatelessWidget
 {
   int posts;
-  int? friends;
+  //int? friends;
+  bool clickable;
+  List<dynamic> friends;
+  List<dynamic>? friends_requests;
+  List<dynamic>? friends_pending;
 
   ProfileData
   (
     {
       super.key,
       required this.posts,
-      this.friends
+      required this.friends,
+      required this.clickable,
+      this.friends_requests,
+      this.friends_pending
     }
   );
 
@@ -39,21 +47,15 @@ class ProfileData extends StatelessWidget
           ],
         ),
 
-        Visibility
-        (
-          visible: friends != null,
-          child: SizedBox(
-            width: 30,
-          )
-        ),
+        SizedBox(width: 30),
 
-        Visibility
+        InkWell
         (
-          visible: friends != null,
-          child: Column(
+          child: Column
+          (
             children: [
               Text(
-                friends.toString(),
+                friends.length.toString(),
                 style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w700,
@@ -68,7 +70,19 @@ class ProfileData extends StatelessWidget
               )
             ],
           ),
-        ),
+          onTap: ()
+          {
+            {
+              List<List<dynamic>> data = List.from([
+                friends, 
+                friends_pending,
+                friends_requests
+              ]); 
+              context.push('/friends', extra: data);
+            }
+          },
+        )
+        
       ],
     );
   }

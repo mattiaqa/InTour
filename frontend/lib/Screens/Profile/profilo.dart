@@ -5,6 +5,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/Screens/Common/appbar.dart';
 import 'package:frontend/Screens/Common/bottomMenu.dart';
+import 'package:frontend/Screens/Common/emptyState.dart';
 import 'package:frontend/Screens/Common/uploadPictures.dart';
 import 'package:frontend/Screens/Profile/Components/friendrequest.dart';
 import 'package:frontend/Screens/Profile/Components/posts.dart';
@@ -75,8 +76,7 @@ class _ProfiloPage extends State<ProfiloPage> {
                     context.go('/login');
                   },
                 )
-              ) 
-              
+              )
             ],
           ),
           body: SingleChildScrollView
@@ -117,7 +117,7 @@ class _ProfiloPage extends State<ProfiloPage> {
                             BottomMenuButton(
                               icon: Icons.highlight_remove_rounded, 
                               text: "Rimuovi", 
-                              action: (){}
+                              action: () => PictureUploader.uploadImage(File(''))
                             ),
                           ]);
                         },
@@ -130,7 +130,10 @@ class _ProfiloPage extends State<ProfiloPage> {
                           ProfileData
                           (
                             posts: userPosts.length,
-                            friends: userData['friends'].length
+                            clickable: widget.username == AppService.instance.currentUser!.userid,
+                            friends: userData['friends'],
+                            friends_pending: userData['friends_pending'],
+                            friends_requests: userData['friends_request'],
                           ),
 
                           SizedBox(height: 20),
@@ -150,7 +153,18 @@ class _ProfiloPage extends State<ProfiloPage> {
 
                   const SizedBox(height: 50),
 
-                  PostsGrid(posts: userPosts),
+                  userPosts.isNotEmpty ?
+                    PostsGrid(posts: userPosts)
+                    :
+                    Padding
+                    (
+                      padding: EdgeInsets.only(top: 100),
+                      child: EmptyState(
+                        icon: Icons.landscape_rounded,
+                        message: 'Non hai ancora postato niente',
+                      )
+                    )
+                    
                 ],
               ),
             )

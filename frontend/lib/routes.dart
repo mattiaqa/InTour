@@ -10,6 +10,7 @@ import 'package:frontend/Screens/Map/presentation/map_page.dart';
 import 'package:frontend/Screens/Percorsi/dettagli_percorso.dart';
 import 'package:frontend/Screens/Authentication/Register/success.dart';
 import 'package:frontend/Screens/Common/borders.dart';
+import 'package:frontend/Screens/Profile/Components/friends.dart';
 import 'package:frontend/Screens/Share/selected.dart';
 import 'package:frontend/Screens/Share/share.dart';
 import 'package:frontend/Screens/Share/success.dart';
@@ -85,6 +86,12 @@ var router =
       name: 'SearchUser',
       path: '/searchuser',
       builder: (context, state) => SearchUserPage()),
+
+  GoRoute(
+    name: 'Friends',
+    path: '/friends',
+    builder: (context, state) => FriendsPage(friendsData: state.extra as List<List<dynamic>>,)
+  )
 ]);
 
 String? _redirect(BuildContext context, GoRouterState state) {

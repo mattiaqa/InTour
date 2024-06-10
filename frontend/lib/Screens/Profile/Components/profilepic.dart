@@ -18,10 +18,16 @@ class ProfilePic extends StatelessWidget
   @override
   Widget build(BuildContext context)
   {
+    ImageProvider imageProvider;
+    if(imagePath.isNotEmpty)
+      imageProvider = NetworkImage("http://$myIP:8000/api" + imagePath);
+    else
+      imageProvider = AssetImage('assets/images/no_profile_pic.png');
+
     return CircleAvatar
     (
       radius: radius,
-      backgroundImage: NetworkImage("http://$myIP:8000/api" + imagePath),
+      backgroundImage: imageProvider
     );
   }
 }
