@@ -8,3 +8,4 @@ xlrd
 python-dotenv
 python-magic
 numpy
+openpyxl

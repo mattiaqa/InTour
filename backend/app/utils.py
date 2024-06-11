@@ -10,7 +10,7 @@ def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 def init_trails():
-    data = pd.read_excel('/assets/datasets/sentieri-storico-culturali.xls')
+    data = pd.read_excel('/assets/datasets/dataset.xlsx')
 
     for index, row in data.iterrows():
         percorso = Trail(row, index)

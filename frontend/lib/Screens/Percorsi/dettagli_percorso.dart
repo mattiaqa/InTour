@@ -11,7 +11,7 @@ class Percorso {
       summary,
       tips,
       title,
-      imageUrl;
+      imageName;
 
   Percorso(
       {this.category,
@@ -22,7 +22,7 @@ class Percorso {
       this.summary,
       this.tips,
       this.title,
-      this.imageUrl});
+      this.imageName});
 
   factory Percorso.fromJson(Map<String, dynamic> json) {
     return Percorso(
@@ -138,9 +138,9 @@ class DettagliPercorsoState extends State<DettagliPercorso> {
                             semanticsLabel: 'Consigli'),
                       ),
                       SizedBox(height: 20),
-                      if (widget.percorso.imageUrl != null &&
-                          widget.percorso.imageUrl!.isNotEmpty)
-                        Image.network(widget.percorso.imageUrl!),
+                      //if (widget.percorso.imageName != null &&
+                      //    widget.percorso.imageUrl!.isNotEmpty)
+                      //  Image.network(widget.percorso.imageUrl!),
                     ],
                   ),
                 ),

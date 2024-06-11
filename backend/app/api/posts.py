@@ -46,9 +46,6 @@ def upload_posts():
         # create a new ObjectId to use in mongodb
         object_id = ObjectId()
 
-        # use of the ObjectId as the file name
-        #file_name = str(object_id) + '.jpg'
-
         # if current user' directory does not exists, create new one
         upload_folder = f'/src/backend/static/uploads/{user}'
         if not os.path.exists(upload_folder):
@@ -116,7 +113,7 @@ def delete_posts():
         # Check if the post was found and deleted
         if result.deleted_count == 1:
             # remove the image from uploads folder
-            os.remove(f"uploads/{user}/{post_id}.jpg")
+            os.remove(f"/src/backend/static/uploads/{user}/{post_id}")
             return jsonify({"Status": "Success"}), 200
         else:
             return jsonify({"Error": "Post not found"}), 404
@@ -146,12 +143,14 @@ def fetch_friend_posts():
 
         #TODO: add dynamic post loading
         for friend in friends_list:
-            friend_posts = mongo['posts'].find({'creator' : friend}).sort('date')
+            friend_posts = mongo['posts'].find({'creator' : friend})
 
             for post in friend_posts:
                 post['_id'] = str(post['_id'])
                 result.append(post)
-            
+        
+        result.sort(key=lambda x: x['date'])
+
         return jsonify(result), 200
 
     except Exception as e:
@@ -362,7 +361,7 @@ def dislike_post():
     
 
 @bp.route('/uploads/<username>/<filename>')
-#@jwt_required()
+@jwt_required()
 def get_post_image(username, filename):
     """
         Give access to user's uploads
@@ -377,11 +376,10 @@ def get_post_image(username, filename):
           and an HTTP status code of 500.
     """
     try:
-        #user = get_jwt_identity()['username']
+        user = get_jwt_identity()['username']
 
-        # if the user doesn't owns the folder, access is denied
-        #if(user != username or not isFriendOf(username, user)):
-            #return jsonify({"Error":"Unauthorized"}), 403
+        if(not isFriendOf(username, user)):
+            return jsonify({"Error":"Unauthorized"}), 403
 
         # prevent path traversal
         path = f'/src/backend/static/uploads/{username}/{filename}'
