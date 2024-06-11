@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/Screens/Feed/Post/Components/user.dart';
 
 class CommentoTile extends StatelessWidget 
 {
-  final String? user;
-  final String? text;
+  final String user;
+  final String text;
   final void Function()? onTap;
 
   CommentoTile
@@ -34,13 +35,18 @@ class CommentoTile extends StatelessWidget
       (
         borderRadius: BorderRadius.circular(10.0),
       ),
-      child: ListTile
+      child: TinyProfile(
+        username: user, 
+        date: text, 
+      )
+      
+      /*ListTile
       (
         isThreeLine: true,
         title: Text(user!),
         subtitle: Text(text!),
         onTap: onTap,
-      ),
+      ),*/
     );
   }
 }

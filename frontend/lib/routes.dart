@@ -1,5 +1,8 @@
 import 'dart:io';
+//import 'dart:js';
 import 'package:flutter/material.dart';
+import 'package:frontend/Screens/Common/appbar.dart';
+import 'package:frontend/Screens/Feed/Post/post.dart';
 import 'package:frontend/Screens/Feed/feed.dart';
 import 'package:frontend/Screens/Feed/Post/Components/Comments/comments.dart';
 import 'package:frontend/Screens/Feed/Post/Components/Comments/tile.dart';
@@ -42,10 +45,20 @@ var router =
         DettagliPercorso(percorso: state.extra as Percorso),
   ),
   GoRoute(
+    name: 'Dettaglio post',
+    path: '/post',
+    builder: (context, state){
+      return Scaffold(appBar: PageTitle(title: 'Post'), body: state.extra as BachecaTile);
+    }
+  ),
+  GoRoute(
     name: 'Post comments',
     path: '/comments',
     builder: (context, state) =>
-        Commenti(commenti: state.extra as List<CommentoTile>),
+        Commenti(
+          postId: (state.extra as List<dynamic>)[0],
+          commenti: (state.extra as List<dynamic>)[1]
+        ),
   ),
   GoRoute(
       name: 'Profilo',
@@ -58,7 +71,7 @@ var router =
       path: '/userprofile',
       builder: (context, state) {
         return PageBorders(
-          selectedIndex: 3,
+          selectedIndex: 4,
           username: state.extra as String,
         );
       }),
@@ -90,7 +103,7 @@ var router =
   GoRoute(
     name: 'Friends',
     path: '/friends',
-    builder: (context, state) => FriendsPage(friendsData: state.extra as List<List<dynamic>>,)
+    builder: (context, state) => FriendsPage(username: state.extra as String)
   )
 ]);
 

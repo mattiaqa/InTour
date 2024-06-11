@@ -52,16 +52,12 @@ class PageBordersState extends State<PageBorders> {
     return FutureBuilder<bool>(
         future: _hasFriendResquests(),
         builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Scaffold(
-                body: Center(
-                    child:
-                        CircularProgressIndicator())); // Placeholder while loading
-          }
-
-          if (snapshot.hasError) {
+          if (snapshot.connectionState == ConnectionState.waiting) 
+            return Scaffold(body: Center(child:CircularProgressIndicator())); // Placeholder while loading
+          
+          if (snapshot.hasError)
             return Center(child: Text('Error: ${snapshot.error}'));
-          }
+          
           return Scaffold(
             //appBar: AppBar(title: Text(pageName)),
             body: pages[selectedIndex],
@@ -73,12 +69,12 @@ class PageBordersState extends State<PageBorders> {
                           icon: Icons.photo_camera_outlined,
                           text: "Scatta una foto",
                           action: () =>
-                              PictureUploader.pickImage(ImageSource.camera)),
+                              PictureUploader.pickImageForPost(ImageSource.camera, context)),
                       BottomMenuButton(
                           icon: Icons.photo_library_outlined,
                           text: "Scegli dalla galleria",
                           action: () =>
-                              PictureUploader.pickImage(ImageSource.gallery)),
+                              PictureUploader.pickImageForPost(ImageSource.gallery, context)),
                     ]);
                   } else {
                     setState(() {

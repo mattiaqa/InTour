@@ -152,27 +152,26 @@ class RegisterPageState extends State<RegisterPage> {
 
   void tryRegister(BuildContext context) {
     String fullname = nameController.text.toString();
-    int space_index = fullname.indexOf(' ');
-    String name = fullname.substring(0, space_index);
-    String surname = fullname.substring(space_index + 1);
+    //int space_index = fullname.indexOf(' ');
+    //String name = fullname.substring(0, space_index);
+    //String surname = fullname.substring(space_index + 1);
+    String surname = ' ';
     
     
     AuthService.register
     (
       emailController.text.toString(),
-      name,
+      fullname,
       surname,
       userController.text.toString(),
       passwordController.text.toString()
     )
       .then((value) 
       {
-        if (value.valid) 
-        {
+        if (value.valid) {
           context.go('/success');
         } 
-        else 
-        {
+        else {
           setState(() {
             //borderColor = Color.fromARGB(255, 255, 0, 0);
             errorText = value.body;

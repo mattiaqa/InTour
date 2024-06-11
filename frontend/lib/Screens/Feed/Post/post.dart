@@ -1,6 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:frontend/Screens/Common/bottomMenu.dart';
 import 'package:frontend/Screens/Feed/Post/Components/like.dart';
 import 'package:frontend/Screens/Feed/Post/Components/user.dart';
+import 'package:frontend/utils/api_manager.dart';
 import 'package:frontend/utils/app_service.dart';
 import 'package:frontend/utils/constants.dart';
 import 'package:go_router/go_router.dart';
@@ -16,17 +20,19 @@ class BachecaTile extends StatefulWidget {
   String imagePath;
   List<dynamic>? comments;
   List<dynamic>? likers;
+  bool clickable;
 
   BachecaTile
   ({
     required this.id,
     required this.username,
-    required this.userimage,
     required this.date,
     required this.imagePath,
+    this.userimage,
     this.description,
     this.comments,
     this.likers,
+    this.clickable = true,
   });
 
   BachecaTileState createState() => BachecaTileState();
@@ -49,85 +55,108 @@ class BachecaTileState extends State<BachecaTile>
     return Card
     (
       elevation: 0,
-      margin: EdgeInsets.all(8.0),
+      margin: EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 2.0),
       //color: Color.fromARGB(255, 255, 255, 255),
-      shape: RoundedRectangleBorder
-      (
+      shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10.0),
       ),
-      child: Column
-      (
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children:
-        [
-          TinyProfile
-          (
+        children:[
+          TinyProfile(
             username: widget.username!,
             date: formatDateToRelative(widget.date!),
-            image: widget.userimage!
+            image: widget.userimage,
+            clickable: widget.clickable
           ),
-          Container //SizedBox
-          (
-            //height: 300,
-            //width: 300,
+          
+          Container(
             child: Image.network("http://$myIP:8000/api" + widget.imagePath),
           ),
-          SizedBox(height: 8,),
-          Row
-          (
-            children:
-            [
-              Expanded
-              (
-                child: Row
-                (
-                  //mainAxisAlignment: MainAxisAlignment.end,
-                  children:
-                  [
-                    LikeButton
-                    (
-                      liked: liked,
-                      postId: widget.id,
-                      onTap: () 
-                      {
-                        setState(() {
-                          likecount += liked ? -1 : 1;
-                          liked = !liked;
-                        });
-                      }
-                    ),
-                    
-                    const VerticalDivider
-                    (
-                      width: 20,
-                    ),
-                    InkWell
-                    (
-                      child: const Icon
-                      (
-                        Icons.comment_outlined,
-                        size: 40,
-                      ),
-                      onTap: () 
-                      {
-                        context.push('/comments', extra: widget.comments);
-                      },
-                    ),
-                  ],
+          
+          SizedBox(height: 8),
+          
+         
+          Row(
+            //mainAxisAlignment: MainAxisAlignment.end,
+            children:[
+              Visibility(
+                visible: widget.username != AppService.instance.currentUser!.userid,
+                child: LikeButton(
+                  liked: liked,
+                  postId: widget.id,
+                  onTap: () 
+                  {
+                    setState(() {
+                      likecount += liked ? -1 : 1;
+                      liked = !liked;
+                    });
+                  }
                 ),
-              )
+              ),
+               
+              VerticalDivider
+              (
+                width: (widget.username != AppService.instance.currentUser!.userid) ? 15 : 0,
+              ),
+
+              InkWell(
+                child: const Icon(
+                  Icons.comment_outlined,
+                  size: 40,
+                ),
+                onTap: () => context.push('/comments', extra: [widget.id, widget.comments])
+              ),
+
+              // Spacer
+              Spacer(),
+              Visibility(
+                visible: widget.username == AppService.instance.currentUser!.userid,
+                child: InkWell(
+                  child: const Icon(
+                    Icons.delete_forever_outlined,
+                    size: 40,
+                  ),
+                  onTap: () {
+                    ShowBottomMenu(context, "Elimina post", 
+                      [
+                        BottomMenuButton(
+                          icon: Icons.check, 
+                          text: "Sono sicuro", 
+                          action: () async {
+                            Map<String, dynamic> data = {
+                              'post_id': widget.id,
+                            };
+                            ApiManager.postData('post/delete', data).then(
+                              (value) => context.pop()
+                            );
+                          }
+                        ),
+
+                        BottomMenuButton(
+                          icon: Icons.arrow_back_rounded, 
+                          text: "Annulla", 
+                          action: (){}
+                        ),
+                      ]
+                    );
+                  },
+                ),
+              ),
+              
             ],
           ),
-          Text
-          (
-            likecount.toString() + ' Mi piace', 
-            style: TextStyle
-            (
-              fontWeight: FontWeight.w600
-            ),
+          
+          SizedBox(height: 5),
+
+          Text(
+            likecount.toString() + ' Devo andarci', 
+            style: TextStyle(fontWeight: FontWeight.w600),
           ),
+
           Text("${widget.description}"),
-          Divider(height: 20, thickness: 0.4,)
+
+          Divider(height: 20, thickness: 0.4)
         ],
       )
     );

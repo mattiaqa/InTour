@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/Screens/Feed/Post/post.dart';
 import 'package:frontend/utils/constants.dart';
+import 'package:go_router/go_router.dart';
 
 // ignore: must_be_immutable
 class PostsGrid extends StatelessWidget
@@ -24,18 +26,36 @@ class PostsGrid extends StatelessWidget
         (index) {
           return Padding(
             padding: const EdgeInsets.all(0.0),
-            child: Container(
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                  image: NetworkImage('http://$myIP:8000/api' +
-                      posts[index]["img_url"]),
-                  fit: BoxFit.cover,
-                ),
-                borderRadius: BorderRadius.all(
-                  Radius.circular(0.0),
+            child: InkWell
+            (
+              child: Container(
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: NetworkImage('http://$myIP:8000/api' +
+                        posts[index]["img_url"]),
+                    fit: BoxFit.cover,
+                  ),
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(0.0),
+                  ),
                 ),
               ),
-            ),
+
+              onTap: () {
+                BachecaTile tile = BachecaTile(
+                  id: posts[index]['_id'],
+                  username: posts[index]['creator'],
+                  date: posts[index]['date'], 
+                  imagePath: posts[index]['img_url'],
+                  description: posts[index]['description'],
+                  likers: posts[index]['like'],
+                  comments: posts[index]['comments'],
+                  clickable: false,
+                );
+                context.push('/post', extra: tile);
+              }
+            ) 
+            
           );
         },
       ),

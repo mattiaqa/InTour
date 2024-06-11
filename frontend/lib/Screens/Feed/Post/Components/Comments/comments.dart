@@ -1,10 +1,22 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:frontend/Screens/Common/emptyState.dart';
 import 'package:frontend/Screens/Feed/Post/Components/Comments/tile.dart';
+import 'package:frontend/utils/api_manager.dart';
+import 'package:frontend/utils/app_service.dart';
+import 'package:intl/intl.dart';
 
 class Commenti extends StatefulWidget
 {
-  final List<CommentoTile> commenti;
-  Commenti({super.key, required this.commenti});
+  final List<dynamic> commenti;
+  final String postId;
+
+  Commenti({
+    super.key, 
+    required this.postId,
+    required this.commenti,
+  });
   
   @override
   State<Commenti> createState() => CommentiState();
@@ -15,23 +27,105 @@ class CommentiState extends State<Commenti>
   @override
   Widget build(BuildContext context)
   {
+    TextEditingController _controller = TextEditingController();
+    final ScrollController _scrollController = ScrollController();
+
     return Scaffold
     (
       appBar: AppBar(title: Text("Commenti")),
-      body: ListView.builder
-      (
-        itemCount: widget.commenti.length,
-        itemBuilder: (context, index)
-        {
-          return CommentoTile
-          (
-            user: widget.commenti[index].user,
-            text: widget.commenti[index].text,
-          );
-        },
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          widget.commenti.isNotEmpty ?
+          Expanded(child:
+            ListView.builder(
+              controller: _scrollController,
+              itemCount: widget.commenti.length,
+              itemBuilder: (context, index)
+              {
+                return CommentoTile
+                (
+                  user: widget.commenti[index]['user'],
+                  text: widget.commenti[index]['comment'],
+                );
+              },
+            )
+          )
+          :
+            Expanded(
+              child:EmptyState(
+                icon: Icons.comments_disabled_rounded,
+                message: "Nessun commento. Sii il primo!",
+              ),
+            ),
+
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Row(
+              children: <Widget>[
+                Expanded(
+                  child: TextField(
+                    controller: _controller,
+                    minLines: 1,
+                    maxLines: 3,
+                    decoration: InputDecoration(
+                      hintText: 'Scrivi un commento...',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(30.0),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(30.0),
+                        borderSide: BorderSide(color: Colors.blue),
+                      ),
+                      filled: true,
+                      fillColor: Colors.grey[200],
+                      contentPadding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
+                    ),
+                    onSubmitted: (value) => _submitComment(value),
+                  ),
+                ),
+                SizedBox(width: 8.0),
+                IconButton(
+                  icon: Icon(Icons.send, color: Colors.green[500]),
+                  onPressed: (){
+                    _submitComment(_controller.text).then((value)
+                    {
+                      FocusManager.instance.primaryFocus?.unfocus(); // Chiudi la tastiera
+                      _scrollController.animateTo(
+                        _scrollController.position.maxScrollExtent,
+                        duration: Duration(milliseconds: 500),
+                        curve: Curves.easeOut,
+                      );
+                    });
+                  },
+                ),
+              ],
+            ),
+          )
+        ],
       ),
-    ); 
+    );
+  }
+
+  Future _submitComment(String comment) async
+  {
+     Map<String, dynamic> data = {
+      'post_id': widget.postId,
+      'comment': comment
+    };
     
+    var res = await ApiManager.postData('post/comment', data);  
+    var decoded = json.decode(res!);
+
+    Map<String, dynamic> new_comment = {
+      'comment': comment,
+      'comment_date': DateFormat('yyyy-MM-dd').format(DateTime.now()),
+      'user': AppService.instance.currentUser!.userid!,
+    };
+
+    setState(() {
+      widget.commenti.add(new_comment);
+    });
     
   }
 }

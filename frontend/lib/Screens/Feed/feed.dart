@@ -16,8 +16,6 @@ class Bacheca extends StatefulWidget
 
 class BachecaState extends State<Bacheca>
 {
-  List<BachecaTile> posts = [];
-
   @override
   Widget build(BuildContext context)
   {
@@ -30,43 +28,35 @@ class BachecaState extends State<Bacheca>
           return Scaffold(body: Center(child: CircularProgressIndicator())); // Placeholder while loading
         if (snapshot.hasError) 
           return Scaffold(body:Center(child: Text('Error: ${snapshot.error}')));
-         
-        posts = snapshot.data!;
-        return _buildUI(); // Build the UI using fetched data
+        
+        return _buildUI(context, snapshot); // Build the UI using fetched data
       }
     );
   }
 
-  Widget _buildUI()
+  Widget _buildUI(BuildContext context, AsyncSnapshot snapshot)
   {
-    return Scaffold
-    (
-      appBar: PageTitle
-      (
+    return Scaffold(
+      appBar: PageTitle(
         title: "Bacheca",
-        actions: 
-        [
-          IconButton
-          (
+        actions: [
+          IconButton(
             icon: Icon(Icons.person_search_rounded),
             onPressed: () => context.push('/searchuser')
           )
         ],
       ),
-      body: posts.isNotEmpty ? 
-        ListView.builder
-        (
-          itemCount: posts.length,
-          itemBuilder: (context, index) => posts[index]
+      body: snapshot.data.isNotEmpty ? 
+        ListView.builder(
+          itemCount: snapshot.data.length,
+          itemBuilder: (context, index) => snapshot.data[index]
         )
         :
-        EmptyState
-        (
+        EmptyState(
           icon: Icons.landscape_rounded,
           message: 'Ancora nessun post',
         )
     );
-    
   }
 
   Future<List<BachecaTile>> _fetchPosts() async 
@@ -79,10 +69,9 @@ class BachecaState extends State<Bacheca>
     List<BachecaTile> result = List.empty(growable: true);
     for(var post in posts)
     {
-      String userdata = (await ApiManager.fetchData("profile/${post['creator']}/data"))!;
-      String profilepic = (json.decode(userdata))["profile_image_url"];
-      result.add
-      (
+      String profilepic = (await ApiManager.fetchData("profile/${post['creator']}/profile_image"))!;
+      profilepic = json.decode(profilepic)['profile_image_url'];
+      result.add(
         BachecaTile(
           id: post['_id'],
           username: post['creator'],

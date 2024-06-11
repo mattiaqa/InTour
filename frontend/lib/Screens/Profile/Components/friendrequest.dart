@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/Screens/Common/bottomMenu.dart';
 import 'package:frontend/utils/api_manager.dart';
 import 'package:frontend/utils/app_service.dart';
+import 'package:frontend/utils/auth_service.dart';
+import 'package:go_router/go_router.dart';
 
 enum FriendshipState {
   sameUser,
@@ -44,11 +47,68 @@ class FriendRequestButtonState extends State<FirendRequestButton> {
   Widget build(BuildContext context) {
     return SizedBox
     (
-      height: 30,
+      height: (status == FriendshipState.requestRecieved) ? 65 : 30,
       width: 200,
-      child: (status == FriendshipState.sameUser)
-          ? ElevatedButton(onPressed: () {}, child: Text("Modifica"))
-          : ElevatedButton(
+      child: 
+        (status == FriendshipState.sameUser) ? 
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color.fromARGB(255, 212, 52, 40),
+              foregroundColor: Colors.white
+            ),
+            onPressed: () {
+              ShowBottomMenu(context, 'Vuoi disconnetterti?', 
+              [
+                BottomMenuButton(
+                    icon: Icons.logout_rounded, 
+                    text: "Sono sicuro", 
+                    action: () {
+                      AuthService.logout();
+                      context.go('/login');
+                    }
+                  ),
+
+                  BottomMenuButton(
+                    icon: Icons.arrow_back_rounded, 
+                    text: "Annulla", 
+                    action: (){}
+                  ),
+              ]);
+            }, 
+            child: Text("Logout"))
+          :
+          (status == FriendshipState.requestRecieved) ?
+            Column(
+              children:[
+                SizedBox(
+                  height: 30,
+                  width: 200,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      ApiManager.postData('friends/accept', {'username': widget.username})
+                        .then((value) => widget.onTap());
+                    },
+                    child: Text('Accetta amicizia')
+                  ),
+                ),
+                
+                SizedBox(height: 5),
+
+                SizedBox(
+                  height: 30,
+                  width: 200,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      ApiManager.postData('friends/reject', {'username': widget.username})
+                        .then((value) => widget.onTap());
+                    },
+                    child: Text('Rifiuta')
+                  ),
+                ),
+              ],
+            )
+            :
+            ElevatedButton(
               onPressed: () {
                 Map<String, dynamic> frienddata = {
                   'username': widget.username,
@@ -56,19 +116,16 @@ class FriendRequestButtonState extends State<FirendRequestButton> {
 
                 if (status == FriendshipState.friends) {
                   ApiManager.postData('friends/remove', frienddata)
-                      .then((value) => widget.onTap());
+                    .then((value) => widget.onTap());
                 }
-                else if (status == FriendshipState.requestRecieved) {
-                  ApiManager.postData('friends/accept', frienddata)
-                      .then((value) => widget.onTap());
-                } 
                 else if (status == FriendshipState.requestSent) {
-
+                  ApiManager.postData('friends/undo_request', frienddata)
+                    .then((value) => widget.onTap());
                 } 
                 else if (status == FriendshipState.strangers)
                 {
                   ApiManager.postData('friends/request', frienddata)
-                      .then((value) => widget.onTap());
+                    .then((value) => widget.onTap());
                 }
               },
               child: Text(buttonText(status))

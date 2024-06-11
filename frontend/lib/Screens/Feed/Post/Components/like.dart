@@ -51,14 +51,18 @@ class LikeButtonState extends State<LikeButton>
         child: widget.liked ?
           const Icon
           (
-            Icons.favorite, 
+            //Icons.favorite, 
+            //Icons.pin_drop_rounded
+            Icons.add_location_alt_rounded,
             size: 40,
-            color: Colors.red,
+            //color: Colors.red,
+            color: Colors.green,
           )
           :
           const Icon
           (
-            Icons.favorite_border, 
+            //Icons.favorite_border,
+            Icons.add_location_alt_outlined,
             size: 40,
           )
       ),

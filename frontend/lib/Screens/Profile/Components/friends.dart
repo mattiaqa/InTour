@@ -1,18 +1,36 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:frontend/Screens/Common/emptyState.dart';
 import 'package:frontend/Screens/Feed/Post/Components/user.dart';
 import 'package:frontend/Screens/Profile/Components/profilepic.dart';
+import 'package:frontend/utils/api_manager.dart';
 import 'package:go_router/go_router.dart';
 
 class FriendsPage extends StatelessWidget
 {
-  List<List<dynamic>> friendsData;
+  String username;
   FriendsPage({
-    required this.friendsData,
+    required this.username,
   });
 
   @override
   Widget build(BuildContext context) {
+    return FutureBuilder
+    (
+      future: getFriendsData(username),
+      builder: (context, snapshot) => buildUI(context, snapshot)
+    );
+  }
+
+  Widget buildUI(BuildContext context, AsyncSnapshot snapshot)
+  {
+    if (snapshot.connectionState == ConnectionState.waiting)
+      return Scaffold(body: Center(child:CircularProgressIndicator())); // Placeholder while loading
+
+    if (snapshot.hasError)
+      return Center(child: Text('Error: ${snapshot.error}'));
+    
     return DefaultTabController(
       length: 3,
       child: Scaffold(
@@ -22,19 +40,56 @@ class FriendsPage extends StatelessWidget
             tabs: [
               Tab(text: 'Amici'),
               Tab(text: 'Inviate'),
-              Tab(text: 'Ricevute'),
+              Tab(
+                  child: Stack(
+                    alignment: Alignment.topRight,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text('Ricevute'),
+                      ),
+                      if (snapshot.data[2].isNotEmpty)
+                        Positioned(
+                          right: 0,
+                          top: 0,
+                          child: Container(
+                            width: 10,
+                            height: 10,
+                            decoration: BoxDecoration(
+                              color: Colors.red,
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                        ),
+                    ],
+                  )
+              )
             ],
           ),
         ),
         body: TabBarView(
           children: [
-            FriendsList(friendsData[0]),
-            SentRequestsList(friendsData[1]),
-            ReceivedRequestsList(friendsData[2]),
+            FriendsList(snapshot.data[0]),
+            SentRequestsList(snapshot.data[1]),
+            ReceivedRequestsList(snapshot.data[2]),
           ],
         ),
       ),
     );
+  }
+
+  Future<List<List<dynamic>>> getFriendsData(String username) async
+  {
+    List<List<dynamic>> result = List.empty(growable: true);
+
+    String? response= await ApiManager.fetchData('profile/$username/data');
+    Map<String, dynamic> profile = json.decode(response!);
+
+    result.add(profile['friends'] ?? List.empty(growable: true));
+    result.add(profile['friends_pending']  ?? List.empty(growable: true));
+    result.add(profile['friends_request'] ?? List.empty(growable: true));
+
+    return result;
   }
 }
 
@@ -54,9 +109,7 @@ class FriendsList extends StatelessWidget {
         itemCount: users.length,
         itemBuilder: (context, index) {
           return TinyProfile(
-            username: users[index], 
-            date: '', 
-            image: ''
+            username: users[index]
           );
         }
       )
@@ -70,7 +123,7 @@ class FriendsList extends StatelessWidget {
 }
 
 class SentRequestsList extends StatelessWidget {
- late List<dynamic> users;
+  late List<dynamic> users;
 
   SentRequestsList(List<dynamic> users)
   {
@@ -84,9 +137,7 @@ class SentRequestsList extends StatelessWidget {
         itemCount: users.length,
         itemBuilder: (context, index) {
           return TinyProfile(
-            username: users[index], 
-            date: '', 
-            image: ''
+            username: users[index]
           );
         }
       )
@@ -100,7 +151,8 @@ class SentRequestsList extends StatelessWidget {
 }
 
 class ReceivedRequestsList extends StatelessWidget {
- late List<dynamic> users;
+  late List<dynamic> users;
+  late List<dynamic> pfps;
 
   ReceivedRequestsList(List<dynamic> users)
   {
@@ -114,9 +166,7 @@ class ReceivedRequestsList extends StatelessWidget {
         itemCount: users.length,
         itemBuilder: (context, index) {
           return TinyProfile(
-            username: users[index], 
-            date: '', 
-            image: ''
+            username: users[index]
           );
         }
       )

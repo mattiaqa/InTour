@@ -53,7 +53,7 @@ def get_user_profile_image(username):
         if not user_data:
             return jsonify(), 404
 
-        return jsonify(user_data['profile_image_url']), 200
+        return jsonify({"profile_image_url":user_data['profile_image_url']}), 200
     except Exception as e:
         current_app.logger.error("Internal Server Error: %s", e)
         return jsonify({"Error": "Internal Server Error"}), 500

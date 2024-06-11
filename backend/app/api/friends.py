@@ -109,7 +109,7 @@ def add_friends_request_reject():
         # update the friends list for both of these two users
         mongo['users'].update_one(
             {'_id' : user},
-            {'$pull' : {'friends_request' : user}}
+            {'$pull' : {'friends_request' : friend_to_add}}
         )
         mongo['users'].update_one(
             {'_id' : friend_to_add},

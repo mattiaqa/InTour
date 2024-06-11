@@ -1,5 +1,46 @@
 import 'package:flutter/material.dart';
 
+void ShowBottomMenuText(BuildContext context, String title, )
+{
+  showModalBottomSheet(
+  context: context,
+  isScrollControlled: true, // Imposta questa proprietà su true
+  builder: (BuildContext context) {
+    return SingleChildScrollView( // Avvolgi il foglio modale con SingleChildScrollView
+      child: Container(
+        padding: EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            TextField(
+              maxLength: 256,
+              maxLines: null,
+              decoration: InputDecoration(
+                hintText: 'Inserisci il tuo testo (max 256 caratteri)',
+                border: OutlineInputBorder(),
+                contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+              ),
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                // Aggiungi qui la logica per inviare il contenuto inserito
+                Navigator.pop(context); // Chiude il foglio modale
+              },
+              child: Text('Invia'),
+            ),
+          ],
+        ),
+      ),
+    );
+  },
+);
+
+}
+
+
+
 void ShowBottomMenu(BuildContext context, String title, List<BottomMenuButton> buttons)
 {
   showModalBottomSheet<void>(
@@ -81,7 +122,11 @@ class BottomMenuButton extends StatelessWidget
             iconSize: 40,
             padding: EdgeInsets.all(30),
             //color: Colors.white, // Colore dell'icona
-            onPressed: () => action(), // Funzione di callback
+            onPressed: () {
+              action(); 
+              //if(Navigator.canPop(context))
+                Navigator.pop(context);
+            }, // Funzione di callback
           ),
         ),
         SizedBox(height: 8),

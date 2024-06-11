@@ -53,9 +53,14 @@ dev_dependencies:
   flutter_launcher_icons: ^0.13.1
 
 flutter_launcher_icons:
-  android: true
-  ios: true
-  image_path: "assets/images/splash.png"
+  android: #true
+    image_width: 600dp
+    image_height: 600dp
+  ios: #true
+    image_width: 200dp
+    image_height: 200dp
+  image_path: "assets/images/InTour_logo.png"
+  fill: true
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
@@ -66,7 +71,7 @@ flutter_launcher_icons:
 
 flutter_native_splash:
   color: "#dd998a"
-  image: assets/images/splash.png
+  image: assets/images/InTour_logo.png
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
