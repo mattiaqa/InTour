@@ -22,6 +22,7 @@ class Trail:
     def to_dict(self):
         return {
             "trail_id" : self.trail_id,
+            "category" : self.category,
             "imageName" : self.imageName,
             "title" : self.title,
             "summary" : self.summary,

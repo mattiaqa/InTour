@@ -73,7 +73,7 @@ def get_user_post(username):
     try:
         current_user = get_jwt_identity()['username']
 
-        if(not isFriendOf(username, current_user)):
+        if(username != current_user and not isFriendOf(username, current_user)):
             return jsonify({"Error":"Unauthorized"}), 403
             
 

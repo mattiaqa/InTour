@@ -25,6 +25,7 @@ def register():
             "password": password,
             "birthdate": birthdate,
             "profile_image_url": "",
+            "description":"",
             "friends" : [],
             "friends_request": [],
             "friends_pending":[]

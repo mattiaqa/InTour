@@ -202,8 +202,23 @@ class _MapPageState extends State<MapPage> {
     // FAI LA CHIAMATA PER PRENDERTI I PERCORSI E PASSALI COME ARRAY
     await addSource([
       Percorso(
+        category: 'category',
+        imageName: 'imageName',
         title: 'title',
+        summary: 'summary',
         description: 'description',
+        tips: 'tips',
+        length: 'length',
+        security: 'security',
+        equipment: 'equipment',
+        references: 'references',
+        startpoint: 'startpoint',
+        endpoint: 'endpoint',
+        climb: 'climb',
+        descent: 'descent',
+        difficulty: 'difficulty',
+        duration: 'duration',
+        coords: 'coords',
       ),
     ]);
   }

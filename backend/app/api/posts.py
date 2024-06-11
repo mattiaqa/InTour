@@ -361,7 +361,7 @@ def dislike_post():
     
 
 @bp.route('/uploads/<username>/<filename>')
-@jwt_required()
+#@jwt_required()
 def get_post_image(username, filename):
     """
         Give access to user's uploads
@@ -376,10 +376,10 @@ def get_post_image(username, filename):
           and an HTTP status code of 500.
     """
     try:
-        user = get_jwt_identity()['username']
+        #user = get_jwt_identity()['username']
 
-        if(not isFriendOf(username, user)):
-            return jsonify({"Error":"Unauthorized"}), 403
+        #if(not isFriendOf(username, user)):
+        #    return jsonify({"Error":"Unauthorized"}), 403
 
         # prevent path traversal
         path = f'/src/backend/static/uploads/{username}/{filename}'
