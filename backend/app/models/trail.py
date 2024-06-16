@@ -17,7 +17,8 @@ class Trail:
         self.descent = trail.iloc[27]
         self.difficulty = trail.iloc[28]
         self.duration = trail.iloc[29]
-        self.coords = trail.iloc[30]
+        self.x = trail.iloc[30]
+        self.y = trail.iloc[31]
 
     def to_dict(self):
         return {
@@ -38,5 +39,6 @@ class Trail:
             "descent" : self.descent,
             "difficulty" : self.difficulty,
             "duration" : self.duration,
-            "coords" : self.coords
+            "x" : self.x,
+            "y" : self.y
         }

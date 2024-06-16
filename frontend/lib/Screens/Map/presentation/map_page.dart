@@ -9,6 +9,8 @@ import 'package:frontend/Screens/Map/domain/map_assets.dart';
 import 'package:frontend/Screens/Map/domain/map_keys.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
+import 'package:frontend/utils/api_manager.dart';
+import 'package:frontend/utils/constants.dart';
 
 class MapPage extends StatefulWidget {
   const MapPage({super.key});
@@ -35,9 +37,11 @@ class _MapPageState extends State<MapPage> {
             itemBuilder: (context, index) {
               final percorso = percorsi?[index];
               if (percorso != null) {
-                return ListTile(
-                  title: Text(percorso.title ?? ''),
-                  subtitle: Text(percorso.description ?? ''),
+                return PercorsoTile(
+                  title: percorso.title ?? '',
+                  category: percorso.category ?? '',
+                  imageName: percorso.imageName ?? '',
+                  description: percorso.description ?? '',
                   onTap: () => context.push(
                     '/percorso',
                     extra: percorso,
@@ -199,28 +203,10 @@ class _MapPageState extends State<MapPage> {
         _controller.style.addStyleLayer(unclusteredLayer, null);
       }
     });
-    // FAI LA CHIAMATA PER PRENDERTI I PERCORSI E PASSALI COME ARRAY
-    await addSource([
-      Percorso(
-        category: 'category',
-        imageName: 'imageName',
-        title: 'title',
-        summary: 'summary',
-        description: 'description',
-        tips: 'tips',
-        length: 'length',
-        security: 'security',
-        equipment: 'equipment',
-        references: 'references',
-        startpoint: 'startpoint',
-        endpoint: 'endpoint',
-        climb: 'climb',
-        descent: 'descent',
-        difficulty: 'difficulty',
-        duration: 'duration',
-        coords: 'coords',
-      ),
-    ]);
+
+    await addSource(
+      await _fetchPercorsi(),
+    );
   }
 
   Future<void> addStyleImage() async {
@@ -305,26 +291,104 @@ class _MapPageState extends State<MapPage> {
     }
   }
 
-  String eventsGeoJson(List<Percorso> events) {
+  String eventsGeoJson(List<Percorso> trails) {
     return jsonEncode(
       {
         'type': 'FeatureCollection',
-        'features': events.map((event) {
+        'features': trails.map((trail) {
           return {
             'type': 'Feature',
             'geometry': Point(
               coordinates: Position(
-                // IN QUESTO PUNTO DEVI PASSARE LE COORDINATE DEL PERCORSO: SOSTITUISCI 0,0 CON LE RISPETTIVE COORDINATE
-                12.244007095329533,
-                45.66746798861351,
-                //event.addressData.coordinates.y,
-                // event.addressData.coordinates.x,
+                trail.coords!.x,
+                trail.coords!.y,
               ),
             ).toJson(),
-            'properties': event.toJson(),
+            'properties': trail.toJson(),
           };
         }).toList()
       },
+    );
+  }
+
+  Future<List<Percorso>> _fetchPercorsi() async {
+    var response = await ApiManager.fetchData('trails');
+    if (response != null) {
+      response = response.replaceAll(' NaN,', '"NaN",');
+      var results = jsonDecode(response) as List?;
+
+      if (results != null) {
+        return results.map((e) => Percorso.fromJson(e)).toList();
+      }
+    }
+    return [];
+  }
+}
+
+class PercorsoTile extends StatelessWidget {
+  String? title;
+  String? category;
+  String? imageUrl;
+  String? description;
+  String? imageName;
+
+  void Function()? onTap;
+
+  PercorsoTile({
+    required this.title,
+    required this.category,
+    required this.description,
+    required this.imageName,
+    this.onTap,
+  });
+
+  factory PercorsoTile.fromJson(Map<String, dynamic> json) {
+    return PercorsoTile(
+      title: json['title'] ?? '',
+      category: json['category'] ?? '',
+      description: json['description'] ?? '',
+      imageName: json['imageName'],
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(15),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(15),
+              child: Image.network(
+                "http://$myIP:8000/api/uploads/trails/$imageName",
+                width: double.infinity,
+                height: 200,
+                fit: BoxFit.cover,
+              ),
+            ),
+            SizedBox(height: 16),
+            Text(
+              title!,
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            SizedBox(height: 8),
+            Text(
+              description!,
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.grey[600],
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

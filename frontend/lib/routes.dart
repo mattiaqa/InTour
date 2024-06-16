@@ -1,11 +1,10 @@
 import 'dart:io';
-//import 'dart:js';
+
 import 'package:flutter/material.dart';
 import 'package:frontend/Screens/Common/appbar.dart';
 import 'package:frontend/Screens/Feed/Post/post.dart';
 import 'package:frontend/Screens/Feed/feed.dart';
 import 'package:frontend/Screens/Feed/Post/Components/Comments/comments.dart';
-import 'package:frontend/Screens/Feed/Post/Components/Comments/tile.dart';
 import 'package:frontend/Screens/Authentication/Login/login.dart';
 import 'package:frontend/Screens/Authentication/Register/register.dart';
 import 'package:frontend/Screens/Feed/search.dart';
@@ -45,20 +44,18 @@ var router =
         DettagliPercorso(percorso: state.extra as Percorso),
   ),
   GoRoute(
-    name: 'Dettaglio post',
-    path: '/post',
-    builder: (context, state){
-      return Scaffold(appBar: PageTitle(title: 'Post'), body: state.extra as BachecaTile);
-    }
-  ),
+      name: 'Dettaglio post',
+      path: '/post',
+      builder: (context, state) {
+        return Scaffold(
+            appBar: PageTitle(title: 'Post'), body: state.extra as BachecaTile);
+      }),
   GoRoute(
     name: 'Post comments',
     path: '/comments',
-    builder: (context, state) =>
-        Commenti(
-          postId: (state.extra as List<dynamic>)[0],
-          commenti: (state.extra as List<dynamic>)[1]
-        ),
+    builder: (context, state) => Commenti(
+        postId: (state.extra as List<dynamic>)[0],
+        commenti: (state.extra as List<dynamic>)[1]),
   ),
   GoRoute(
       name: 'Profilo',
@@ -99,12 +96,10 @@ var router =
       name: 'SearchUser',
       path: '/searchuser',
       builder: (context, state) => SearchUserPage()),
-
   GoRoute(
-    name: 'Friends',
-    path: '/friends',
-    builder: (context, state) => FriendsPage(username: state.extra as String)
-  )
+      name: 'Friends',
+      path: '/friends',
+      builder: (context, state) => FriendsPage(username: state.extra as String))
 ]);
 
 String? _redirect(BuildContext context, GoRouterState state) {

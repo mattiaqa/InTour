@@ -6,7 +6,7 @@ class PercorsoTile extends StatelessWidget {
   String? title;
   String? category;
   String? startpoint;
-  String? imageUrl;
+  String? imageName;
 
   void Function()? onTap;
 
@@ -14,7 +14,7 @@ class PercorsoTile extends StatelessWidget {
     required this.title,
     required this.category,
     required this.startpoint,
-    this.imageUrl,
+    required this.imageName,
     this.onTap,
   });
 
@@ -22,7 +22,8 @@ class PercorsoTile extends StatelessWidget {
     return PercorsoTile(
         title: json['title'] ?? '',
         category: json['category'] ?? '',
-        startpoint: json['startpoint'] ?? '');
+        startpoint: json['startpoint'] ?? '',
+        imageName: json['imageName'] ?? '');
   }
 
   @override
@@ -43,7 +44,7 @@ class PercorsoTile extends StatelessWidget {
               ClipRRect(
                 borderRadius: BorderRadius.circular(15),
                 child: Image.network(
-                  "http://$myIP:8000/api/uploads/test/image.jpg",
+                  "http://$myIP:8000/api/uploads/trails/${imageName}",
                   width: double.infinity,
                   height: 200,
                   fit: BoxFit.cover,
