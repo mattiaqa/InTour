@@ -25,7 +25,7 @@ class PercorsiState extends State<Percorsi> {
     'Enogastronomico': Icons.local_bar,
     'Storico-Culturale': Icons.account_balance,
     'Sci': Icons.ac_unit
-  }; // Replace with your actual categories and icons
+  };
 
   List<String> categories = [
     'Panoramico',
@@ -34,7 +34,7 @@ class PercorsiState extends State<Percorsi> {
     'Enogastronomico',
     'Storico-Culturale',
     'Sci'
-  ]; // Define your categories here
+  ];
 
   @override
   void initState() {
@@ -50,8 +50,7 @@ class PercorsiState extends State<Percorsi> {
 
       if (results != null) {
         trails = results.map((e) => Percorso.fromJson(e)).toList();
-        _filterTrails(
-            ''); // Apply initial filter (show all) after fetching data
+        _filterTrails('');
         return trails;
       }
     }
