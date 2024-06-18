@@ -81,7 +81,7 @@ class _ProfiloPage extends State<ProfiloPage> {
         
         Map<String,dynamic> userData = snapshot.data![0] as Map<String,dynamic>;
         List<dynamic> userPosts = snapshot.data![1] as List<dynamic>;
-        String fullname = (userData['name'] ?? '');
+        String fullname = (userData['name'] ?? '') + ' ' + (userData['surname'] ?? '');
         
         return Scaffold(
           bottomSheet: isDescriptionTextFieldVisible ? _buildBottomSheet(context) : null,
@@ -220,12 +220,17 @@ class _ProfiloPage extends State<ProfiloPage> {
                         child: userData['description'] != null && (userData['description'] as String).isNotEmpty ?
                           Text(userData['description'])
                           :
-                          Text('Racconta qualcosa di te...',
+                          Text(widget.username == AppService.instance.currentUser!.userid ? 
+                            'Racconta qualcosa di te...':
+                            '',
                             style: TextStyle(
                               fontStyle: FontStyle.italic
                             ),
                           ),
+                        
                         onTap: () {
+                          if(widget.username != AppService.instance.currentUser!.userid)
+                            return;
                           setState(() {
                             descriptionTextController.text = userData['description'] ?? '';
                             isDescriptionTextFieldVisible = true;
@@ -267,7 +272,7 @@ class _ProfiloPage extends State<ProfiloPage> {
 
   Future<List<dynamic>> getPostsOfUser(String user) async {
     String? data = await ApiManager.fetchData('profile/$user/posts');
-    List<dynamic> allposts = json.decode(data!);
+    List<dynamic> allposts = json.decode(data ?? '[]');
 
     return allposts.reversed.toList();
   }
