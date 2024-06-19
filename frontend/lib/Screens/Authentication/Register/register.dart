@@ -14,7 +14,10 @@ class RegisterPageState extends State<RegisterPage> {
   TextEditingController nameController = TextEditingController();
   TextEditingController userController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
-  String errorText = "";
+  TextEditingController confirmPasswordController = TextEditingController();
+
+  bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
 
   bool _isValidEmail(String email) {
     final regex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
@@ -26,7 +29,15 @@ class RegisterPageState extends State<RegisterPage> {
   }
 
   bool _isValidUsername(String username) {
-    return username.length > 3 && !username.contains(' ');
+    return username.length > 3 &&
+        !username.contains('*') &&
+        !username.contains("'") &&
+        !username.contains('"') &&
+        !username.contains(',') &&
+        !username.contains('@') &&
+        !username.contains('<') &&
+        !username.contains('>') &&
+        !username.contains('!');
   }
 
   bool _isValidPassword(String password) {
@@ -38,33 +49,30 @@ class RegisterPageState extends State<RegisterPage> {
     String fullname = nameController.text.toString();
     String username = userController.text.toString();
     String password = passwordController.text.toString();
+    String confirmPassword = confirmPasswordController.text.toString();
 
     if (!_isValidEmail(email)) {
-      setState(() {
-        errorText = "Email non valida!";
-      });
+      _showError(context, "Email non valida!");
       return;
     }
 
     if (!_isValidName(fullname)) {
-      setState(() {
-        errorText = "Il nome non deve superare i 32 caratteri!";
-      });
+      _showError(context, "Il nome non deve superare i 32 caratteri!");
       return;
     }
 
     if (!_isValidUsername(username)) {
-      setState(() {
-        errorText =
-            "Lo username deve essere più lungo di 3 caratteri e non deve contenere spazi!";
-      });
+      _showError(context, "Lo username deve essere più lungo di 3 caratteri e non deve contenere caratteri speciali!");
       return;
     }
 
     if (!_isValidPassword(password)) {
-      setState(() {
-        errorText = "La password deve essere lunga almeno 8 caratteri!";
-      });
+      _showError(context, "La password deve essere lunga almeno 8 caratteri!");
+      return;
+    }
+
+    if (password != confirmPassword) {
+      _showError(context, "Le password non coincidono!");
       return;
     }
 
@@ -80,12 +88,17 @@ class RegisterPageState extends State<RegisterPage> {
       if (value.valid) {
         context.go('/success');
       } else {
-        setState(() {
-          errorText = value.body;
-          passwordController.clear();
-        });
+        _showError(context, value.body);
+        passwordController.clear();
+        confirmPasswordController.clear();
       }
     });
+  }
+
+  void _showError(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
   }
 
   @override
@@ -152,13 +165,50 @@ class RegisterPageState extends State<RegisterPage> {
                     SizedBox(height: 20),
                     TextField(
                       controller: passwordController,
-                      obscureText: true,
+                      obscureText: _obscurePassword,
                       decoration: InputDecoration(
                         prefixIcon: Icon(Icons.lock),
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _obscurePassword
+                                ? Icons.visibility
+                                : Icons.visibility_off,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _obscurePassword = !_obscurePassword;
+                            });
+                          },
+                        ),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(30),
                         ),
                         hintText: "Password",
+                      ),
+                    ),
+                    SizedBox(height: 20),
+                    TextField(
+                      controller: confirmPasswordController,
+                      obscureText: _obscureConfirmPassword,
+                      decoration: InputDecoration(
+                        prefixIcon: Icon(Icons.lock),
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _obscureConfirmPassword
+                                ? Icons.visibility
+                                : Icons.visibility_off,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _obscureConfirmPassword =
+                                  !_obscureConfirmPassword;
+                            });
+                          },
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        hintText: "Conferma Password",
                       ),
                     ),
                     SizedBox(height: 30),
@@ -185,20 +235,13 @@ class RegisterPageState extends State<RegisterPage> {
                             text: "Accedi",
                             style: TextStyle(color: Colors.blue),
                             recognizer: TapGestureRecognizer()
-                              ..onTap = () => GoRouter.of(context).go("/login"),
+                              ..onTap = () =>
+                                  GoRouter.of(context).go("/login"),
                           ),
                         ],
                       ),
                     ),
                     SizedBox(height: 20),
-                    Text(
-                      errorText,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.redAccent,
-                      ),
-                    ),
                   ],
                 ),
               ),

@@ -12,6 +12,7 @@ import 'package:frontend/Screens/Map/presentation/map_page.dart';
 import 'package:frontend/Screens/Percorsi/dettagli_percorso.dart';
 import 'package:frontend/Screens/Authentication/Register/success.dart';
 import 'package:frontend/Screens/Common/borders.dart';
+import 'package:frontend/Screens/Percorsi/percorsi.dart';
 import 'package:frontend/Screens/Profile/Components/friends.dart';
 import 'package:frontend/Screens/Share/selected.dart';
 import 'package:frontend/Screens/Share/share.dart';
@@ -38,6 +39,11 @@ var router =
     builder: (context, state) => PageBorders(),
   ),
   GoRoute(
+    name: 'Percorsi',
+    path: '/percorsi',
+    builder: (context, state) => Percorsi(chooseLocationForPosts: state.extra as bool),
+  ),
+  GoRoute(
     name: 'Dettagli percorso',
     path: '/percorso',
     builder: (context, state) =>
@@ -55,7 +61,9 @@ var router =
     path: '/comments',
     builder: (context, state) => Commenti(
         postId: (state.extra as List<dynamic>)[0],
-        commenti: (state.extra as List<dynamic>)[1]),
+        commenti: (state.extra as List<dynamic>)[1],
+        postUser: (state.extra as List<dynamic>)[2]
+      ),
   ),
   GoRoute(
       name: 'Profilo',

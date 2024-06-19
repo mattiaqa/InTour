@@ -75,9 +75,23 @@ class _ProfiloPage extends State<ProfiloPage> {
         if (snapshot.connectionState == ConnectionState.waiting)
           return Scaffold(body: Center(child: CircularProgressIndicator(),),);
         if (snapshot.hasError)
-          return Scaffold(body: Center(
-            child: Text('Errore durante il recupero dei dati del profilo: ${snapshot.error}')
-          ));
+            return Scaffold(
+              body: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: 
+                [
+                  EmptyState(
+                    icon: Icons.signal_wifi_connected_no_internet_4_rounded,
+                    message: 'Errore durante la connessione al server',
+                  ),
+                  SizedBox(height: 15),
+                  ElevatedButton(
+                    child: Text("RIPROVA"),
+                    onPressed: () => setState((){})
+                  )
+                ],
+              )
+            );
         
         Map<String,dynamic> userData = snapshot.data![0] as Map<String,dynamic>;
         List<dynamic> userPosts = snapshot.data![1] as List<dynamic>;

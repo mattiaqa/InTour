@@ -26,9 +26,24 @@ class BachecaState extends State<Bacheca>
       {
         if (snapshot.connectionState == ConnectionState.waiting) 
           return Scaffold(body: Center(child: CircularProgressIndicator())); // Placeholder while loading
-        if (snapshot.hasError) 
-          return Scaffold(body:Center(child: Text('Error: ${snapshot.error}')));
-        
+        if (snapshot.hasError)
+            return Scaffold(
+              body: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: 
+                [
+                  EmptyState(
+                    icon: Icons.signal_wifi_connected_no_internet_4_rounded,
+                    message: 'Errore durante la connessione al server',
+                  ),
+                  SizedBox(height: 15),
+                  ElevatedButton(
+                    child: Text("RIPROVA"),
+                    onPressed: () => setState((){})
+                  )
+                ],
+              )
+            );
         return _buildUI(context, snapshot); // Build the UI using fetched data
       }
     );

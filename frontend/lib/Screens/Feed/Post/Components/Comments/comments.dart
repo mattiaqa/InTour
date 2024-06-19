@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:frontend/Screens/Common/bottomMenu.dart';
 import 'package:frontend/Screens/Common/emptyState.dart';
 import 'package:frontend/Screens/Feed/Post/Components/Comments/tile.dart';
 import 'package:frontend/utils/api_manager.dart';
@@ -11,11 +12,13 @@ class Commenti extends StatefulWidget
 {
   final List<dynamic> commenti;
   final String postId;
+  final String postUser;
 
   Commenti({
     super.key, 
     required this.postId,
     required this.commenti,
+    required this.postUser
   });
   
   @override
@@ -43,11 +46,42 @@ class CommentiState extends State<Commenti>
               itemCount: widget.commenti.length,
               itemBuilder: (context, index)
               {
-                return CommentoTile
-                (
-                  user: widget.commenti[index]['user'],
-                  text: widget.commenti[index]['comment'],
+                return InkWell(
+                  child: CommentoTile(
+                    user: widget.commenti[index]['user'],
+                    text: widget.commenti[index]['comment'],
+                    commentId: widget.commenti[index]['commentId'],
+                  ),
+                  onTap: () {
+                    if(widget.commenti[index]['user'] == AppService.instance.currentUser!.userid ||
+                      widget.postUser == AppService.instance.currentUser!.userid
+                    )
+                      ShowBottomMenu(context, "Rimuovi commento", 
+                      [
+                        BottomMenuButton(
+                          icon: Icons.check, 
+                          text: "Sono sicuro", 
+                          action: () async {
+                            Map<String, dynamic> data = {
+                              'post_id': widget.postId,
+                              'commentId': widget.commenti[index]['commentId'],
+                            };
+                            if(widget.commenti[index]['commentId'].isNotEmpty)
+                              ApiManager.postData('post/comment/delete', data).then(
+                                (value) => setState(() {}),
+                              );
+                          }
+                        ),
+
+                        BottomMenuButton(
+                          icon: Icons.arrow_back_rounded, 
+                          text: "Annulla", 
+                          action: (){}
+                        ),
+                      ]);
+                  }
                 );
+                
               },
             )
           )
@@ -75,20 +109,20 @@ class CommentiState extends State<Commenti>
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(30.0),
-                        borderSide: BorderSide(color: Colors.blue),
+                        borderSide: BorderSide(color: Colors.green),
                       ),
                       filled: true,
                       fillColor: Colors.grey[200],
                       contentPadding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
                     ),
-                    onSubmitted: (value) => _submitComment(value),
+                    onSubmitted: (value) => _submitComment(value, ''),
                   ),
                 ),
                 SizedBox(width: 8.0),
                 IconButton(
                   icon: Icon(Icons.send, color: Colors.green[500]),
                   onPressed: (){
-                    _submitComment(_controller.text).then((value)
+                    _submitComment(_controller.text, '').then((value)
                     {
                       FocusManager.instance.primaryFocus?.unfocus(); // Chiudi la tastiera
                       _scrollController.animateTo(
@@ -107,7 +141,7 @@ class CommentiState extends State<Commenti>
     );
   }
 
-  Future _submitComment(String comment) async
+  Future _submitComment(String comment, String commentId) async
   {
      Map<String, dynamic> data = {
       'post_id': widget.postId,
@@ -121,6 +155,7 @@ class CommentiState extends State<Commenti>
       'comment': comment,
       'comment_date': DateFormat('yyyy-MM-dd').format(DateTime.now()),
       'user': AppService.instance.currentUser!.userid!,
+      'commentId': commentId,
     };
 
     setState(() {

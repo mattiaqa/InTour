@@ -70,9 +70,12 @@ class BachecaTileState extends State<BachecaTile>
             clickable: widget.clickable
           ),
           
-          Container(
-            child: Image.network("http://$myIP:8000/api" + widget.imagePath),
+          Center(
+            child: Container(
+              child: Image.network("http://$myIP:8000/api" + widget.imagePath),
+            )
           ),
+          
           
           SizedBox(height: 8),
           
@@ -95,8 +98,7 @@ class BachecaTileState extends State<BachecaTile>
                 ),
               ),
                
-              VerticalDivider
-              (
+              VerticalDivider(
                 width: (widget.username != AppService.instance.currentUser!.userid) ? 15 : 0,
               ),
 
@@ -105,7 +107,7 @@ class BachecaTileState extends State<BachecaTile>
                   Icons.comment_outlined,
                   size: 40,
                 ),
-                onTap: () => context.push('/comments', extra: [widget.id, widget.comments])
+                onTap: () => context.push('/comments', extra: [widget.id, widget.comments, widget.username])
               ),
 
               // Spacer
@@ -154,7 +156,43 @@ class BachecaTileState extends State<BachecaTile>
             style: TextStyle(fontWeight: FontWeight.w600),
           ),
 
-          Text("${widget.description}"),
+          Visibility(
+            visible: splitAtFirstOccurrence(widget.description!, '\n')[0].isNotEmpty,
+            child: Row(
+              children: [
+                Icon(
+                  Icons.location_on,
+                  color: Colors.grey,
+                  size: 16,
+                ),
+                SizedBox(width: 4),
+                Text(
+                  "${splitAtFirstOccurrence(widget.description!, '\n')[0]}",
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Visibility(
+            visible: splitAtFirstOccurrence(widget.description!, '\n')[1].isNotEmpty,
+            child: Container(
+              padding: EdgeInsets.only(top: 10),
+              decoration: BoxDecoration(
+                //color: Colors.grey[200],
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Text(
+                "${splitAtFirstOccurrence(widget.description!, '\n')[1]}",
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.black87,
+                ),
+              ),
+            ),
+          ),
 
           Divider(height: 20, thickness: 0.4)
         ],
@@ -188,4 +226,13 @@ class BachecaTileState extends State<BachecaTile>
     return DateFormat('dd/MM/yyyy').format(date);
   }
 
+  List<String> splitAtFirstOccurrence(String input, String delimiter) {
+  int index = input.indexOf(delimiter);
+  if (index == -1) {
+    return [input];
+  }
+  String firstPart = input.substring(0, index);
+  String secondPart = input.substring(index + delimiter.length);
+  return [firstPart, secondPart];
+}
 }

@@ -29,7 +29,23 @@ class FriendsPage extends StatelessWidget
       return Scaffold(body: Center(child:CircularProgressIndicator())); // Placeholder while loading
 
     if (snapshot.hasError)
-      return Center(child: Text('Error: ${snapshot.error}'));
+            return Scaffold(
+              body: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: 
+                [
+                  EmptyState(
+                    icon: Icons.signal_wifi_connected_no_internet_4_rounded,
+                    message: 'Errore durante la connessione al server',
+                  ),
+                  SizedBox(height: 15),
+                  /*ElevatedButton(
+                    child: Text("RIPROVA"),
+                    onPressed: () => setState((){})
+                  )*/
+                ],
+              )
+            );
     
     return DefaultTabController(
       length: 3,
