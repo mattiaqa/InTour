@@ -193,8 +193,9 @@ def add_comment_to_post():
         # if the current user is not friend of the post's creator, denies access
         if not isFriendOf(post['creator'], user['username']):
             return jsonify({"Error":"Unathorized"}), 403
-        
+
         comment = {
+            '_id' : str(ObjectId()),
             'user' : user['username'],
             'comment': comment_text,
             'comment_date': datetime.now().strftime("%Y-%m-%d")
@@ -212,7 +213,7 @@ def add_comment_to_post():
         return jsonify({"error": "something went wrong"}), 500
 
 
-@bp.route('/post/comment', methods=['DELETE'])
+@bp.route('/post/comment/delete', methods=['POST'])
 @jwt_required()
 def remove_comment_post():
     """
@@ -235,9 +236,9 @@ def remove_comment_post():
     try:
         user = get_jwt_identity()
         post_id = request.json['post_id']
-        comment_text = request.json['comment']
+        comment_id = request.json['_id']
 
-        if not post_id or not comment_text:
+        if not post_id or not comment_id:
             return jsonify({"Error":"Missing Parameters"}), 400
         
         post = mongo['posts'].find_one({'_id' : ObjectId(post_id)})
@@ -247,16 +248,14 @@ def remove_comment_post():
         
         comments = post.get('comments', [])
 
-        # Find the index of the comment that matches the user and comment_text
         index_to_delete = None
         for i, comment in enumerate(comments):
-            if comment.get('user') == user['username'] and comment.get('comment') == comment_text:
+            if comment.get('user') == user['username'] and comment.get('_id') == comment_id:
                 index_to_delete = i
                 break
 
         if index_to_delete is not None:
             del comments[index_to_delete]
-            # Update the post with the modified comments list
             mongo['posts'].update_one({'_id': ObjectId(post_id)}, {'$set': {'comments': comments}})
 
             return jsonify({"Status":"Success"}), 200
