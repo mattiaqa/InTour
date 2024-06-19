@@ -157,6 +157,59 @@ def fetch_friend_posts():
         current_app.logger.error("Internal Server Error: %s", e)
         return jsonify({"error": "something went wrong"}), 500
     
+@bp.route('/post/comment/delete', methods=['POST'])
+@jwt_required()
+def remove_comment_post():
+    """
+        Remove a comment's post
+
+        Parameters:
+        - post_id: id of the post.
+        - comment: text of the comment to be removed
+
+        Returns:
+        - If successful, returns a JSON response with a status of success
+          and an HTTP status code of 200.
+        - If the requests is not valid, return an HTTP status code of 400.
+        - If the post is not found, return an HTTP status code of 404.
+        - If any exceptions occur during the process, 
+          logs an internal server error and returns a JSON response with 
+          an error message ({'Error': 'Internal Server Error'}) 
+          and an HTTP status code of 500.
+    """
+    try:
+        user = get_jwt_identity()
+        post_id = request.json['post_id']
+        comment_id = request.json['commentId']
+
+        if not post_id or not comment_id:
+            return jsonify({"Error":"Missing Parameters"}), 400
+        
+        post = mongo['posts'].find_one({'_id' : ObjectId(post_id)})
+
+        if not post:
+            return jsonify({"Error":"Post not found"}), 404
+        
+        comments = post.get('comments', [])
+
+        index_to_delete = None
+        for i, comment in enumerate(comments):
+            if comment.get('user') == user['username'] and comment.get('commentId') == comment_id:
+                index_to_delete = i
+                break
+
+        if index_to_delete is not None:
+            del comments[index_to_delete]
+            mongo['posts'].update_one({'_id': ObjectId(post_id)}, {'$set': {'comments': comments}})
+
+            return jsonify({"Status":"Success"}), 200
+
+        return jsonify({"Error":"Comment not found"}), 404
+    except Exception as e:
+        current_app.logger.error("Internal Server Error: %s", e)
+        return jsonify({"error": "something went wrong"}), 500
+
+
 @bp.route('/post/comment', methods=['POST'])
 @jwt_required()
 def add_comment_to_post():
@@ -191,10 +244,11 @@ def add_comment_to_post():
             return jsonify({"Error":"Post not found"}), 404
         
         # if the current user is not friend of the post's creator, denies access
-        if not isFriendOf(post['creator'], user['username']):
+        if user == post['creator'] and not isFriendOf(post['creator'], user['username']):
             return jsonify({"Error":"Unathorized"}), 403
-        
+
         comment = {
+            'commentId' : str(ObjectId()),
             'user' : user['username'],
             'comment': comment_text,
             'comment_date': datetime.now().strftime("%Y-%m-%d")
@@ -207,61 +261,6 @@ def add_comment_to_post():
 
         return jsonify({"Status":"Success"}), 200
 
-    except Exception as e:
-        current_app.logger.error("Internal Server Error: %s", e)
-        return jsonify({"error": "something went wrong"}), 500
-
-
-@bp.route('/post/comment', methods=['DELETE'])
-@jwt_required()
-def remove_comment_post():
-    """
-        Remove a comment's post
-
-        Parameters:
-        - post_id: id of the post.
-        - comment: text of the comment to be removed
-
-        Returns:
-        - If successful, returns a JSON response with a status of success
-          and an HTTP status code of 200.
-        - If the requests is not valid, return an HTTP status code of 400.
-        - If the post is not found, return an HTTP status code of 404.
-        - If any exceptions occur during the process, 
-          logs an internal server error and returns a JSON response with 
-          an error message ({'Error': 'Internal Server Error'}) 
-          and an HTTP status code of 500.
-    """
-    try:
-        user = get_jwt_identity()
-        post_id = request.json['post_id']
-        comment_text = request.json['comment']
-
-        if not post_id or not comment_text:
-            return jsonify({"Error":"Missing Parameters"}), 400
-        
-        post = mongo['posts'].find_one({'_id' : ObjectId(post_id)})
-
-        if not post:
-            return jsonify({"Error":"Post not found"}), 404
-        
-        comments = post.get('comments', [])
-
-        # Find the index of the comment that matches the user and comment_text
-        index_to_delete = None
-        for i, comment in enumerate(comments):
-            if comment.get('user') == user['username'] and comment.get('comment') == comment_text:
-                index_to_delete = i
-                break
-
-        if index_to_delete is not None:
-            del comments[index_to_delete]
-            # Update the post with the modified comments list
-            mongo['posts'].update_one({'_id': ObjectId(post_id)}, {'$set': {'comments': comments}})
-
-            return jsonify({"Status":"Success"}), 200
-
-        return jsonify({"Error":"Comment not found"}), 404
     except Exception as e:
         current_app.logger.error("Internal Server Error: %s", e)
         return jsonify({"error": "something went wrong"}), 500

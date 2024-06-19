@@ -8,7 +8,11 @@ import 'dart:convert';
 import 'package:go_router/go_router.dart';
 
 class Percorsi extends StatefulWidget {
-  Percorsi({super.key});
+  bool chooseLocationForPosts;
+  Percorsi({
+    super.key,
+    this.chooseLocationForPosts = false
+  });
   @override
   State<Percorsi> createState() => PercorsiState();
 }
@@ -103,7 +107,7 @@ class PercorsiState extends State<Percorsi> {
                         Icon(
                           categoryIcons[category] ?? Icons.category,
                           color: selectedCategory == category
-                              ? Colors.blue
+                              ? Color.fromARGB(255, 70, 133, 43)
                               : Colors.grey,
                           size: 30,
                         ),
@@ -112,7 +116,7 @@ class PercorsiState extends State<Percorsi> {
                           category,
                           style: TextStyle(
                             color: selectedCategory == category
-                                ? Colors.blue
+                                ? Color.fromARGB(255, 70, 133, 43)
                                 : Colors.grey,
                           ),
                         ),
@@ -140,7 +144,9 @@ class PercorsiState extends State<Percorsi> {
           category: filteredTrails[index].category,
           startpoint: filteredTrails[index].startpoint,
           imageName: filteredTrails[index].imageName,
-          onTap: () => context.push('/percorso', extra: filteredTrails[index]),
+          onTap: () => widget.chooseLocationForPosts ? 
+            context.pop(filteredTrails[index].title) :
+            context.push('/percorso', extra: filteredTrails[index])
         );
       },
     );

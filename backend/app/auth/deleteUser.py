@@ -17,7 +17,7 @@ def delete_user():
         result = mongo['users'].delete_one(query)
 
         if result:
-            shutil.rmtree(f'uploads/{username}/')
+            shutil.rmtree(f'static/uploads/{username}')
             return jsonify({"Status":"Success"}), 200
 
         return jsonify({"Error":"Username not found"}), 404

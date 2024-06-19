@@ -13,9 +13,10 @@ class Response {
 }
 
 class AuthService {
-  static Future<bool> login(String username, String password) async {
+  static Future<int> login(String username, String password) async {
+    final response;
     try {
-      final response = await http.post(
+      response = await http.post(
         Uri.parse('http://$myIP:8000/auth/login'),
         headers: {"Content-Type": "application/json"},
         body: json.encode({'username': username, 'password': password}),
@@ -25,14 +26,13 @@ class AuthService {
         final data = jsonDecode(response.body);
         final SharedPreferences prefs = await SharedPreferences.getInstance();
         prefs.setString("access_token", data['access_token']);
-        return true;
       }
     } catch (e) {
       debugPrint('Errore durante il login: $e');
+      return -1;
     }
-    return false;
+    return response.statusCode;
   }
-
 
   static Future<Response> register(String email, String name, String surname,
       String username, String password) async {

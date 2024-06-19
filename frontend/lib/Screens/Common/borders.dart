@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:frontend/Screens/Common/emptyState.dart';
 import 'package:frontend/Screens/Common/uploadPictures.dart';
 import 'package:frontend/Screens/Feed/feed.dart';
 import 'package:frontend/Screens/Map/presentation/map_page.dart';
@@ -56,7 +57,25 @@ class PageBordersState extends State<PageBorders> {
             return Scaffold(body: Center(child:CircularProgressIndicator())); // Placeholder while loading
           
           if (snapshot.hasError)
-            return Center(child: Text('Error: ${snapshot.error}'));
+            return Scaffold(
+              body: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: 
+                [
+                  EmptyState(
+                    icon: Icons.signal_wifi_connected_no_internet_4_rounded,
+                    message: 'Errore durante la connessione al server',
+                  ),
+                  SizedBox(height: 15),
+                  ElevatedButton(
+                    child: Text("RIPROVA"),
+                    onPressed: () => setState((){})
+                  )
+                ],
+              ) 
+            
+            
+            );
           
           return Scaffold(
             //appBar: AppBar(title: Text(pageName)),

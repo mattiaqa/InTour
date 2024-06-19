@@ -17,6 +17,9 @@ class LoginPageState extends State<LoginPage> {
   TextEditingController userController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
 
+  Widget LoginButton = Text('Login');
+  bool _obscurePassword = true;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -57,9 +60,22 @@ class LoginPageState extends State<LoginPage> {
                     SizedBox(height: 20),
                     TextField(
                       controller: passwordController,
-                      obscureText: true,
+                      obscureText: _obscurePassword,
                       decoration: InputDecoration(
                         prefixIcon: Icon(Icons.lock),
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _obscurePassword
+                                ? Icons.visibility
+                                : Icons.visibility_off,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _obscurePassword =
+                                  !_obscurePassword;
+                            });
+                          },
+                        ),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(30),
                         ),
@@ -68,8 +84,11 @@ class LoginPageState extends State<LoginPage> {
                     ),
                     SizedBox(height: 30),
                     ElevatedButton(
-                      child: Text("Login"),
-                      onPressed: () => tryLogin(context),
+                      child: LoginButton,
+                      onPressed: () {
+                        if(LoginButton is CircularProgressIndicator == false)
+                          tryLogin(context);
+                      },
                       style: ElevatedButton.styleFrom(
                         padding: EdgeInsets.symmetric(vertical: 15),
                         shape: RoundedRectangleBorder(
@@ -107,10 +126,13 @@ class LoginPageState extends State<LoginPage> {
   }
 
   void tryLogin(BuildContext context) {
+    setState(() {
+      LoginButton = CircularProgressIndicator();
+    });
     AuthService.login(
             userController.text.toString(), passwordController.text.toString())
         .then((value) {
-      if (value) {
+      if (value == 200) {
         _fetchUser(userController.text).then((user) {
           if (user != null) {
             AppService.instance.setUserData(user);
@@ -120,14 +142,29 @@ class LoginPageState extends State<LoginPage> {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text('Utente non trovato')),
             );
+            setState(() {
+              LoginButton = Text('Login');
+            });
           }
         });
-      } else {
+      } else if (value == 403) {
         // Gestione errore login fallito
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Email o password errati')),
         );
+        setState(() {
+          LoginButton = Text('Login');
+        });
         passwordController.clear();
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content: Text(
+                  'Il server non è al momento ragiungibile, ci scusiamo per il disagio.')),
+        );
+        setState(() {
+          LoginButton = Text('Login');
+        });
       }
     });
   }
