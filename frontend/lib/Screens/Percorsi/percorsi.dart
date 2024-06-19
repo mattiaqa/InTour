@@ -9,10 +9,7 @@ import 'package:go_router/go_router.dart';
 
 class Percorsi extends StatefulWidget {
   bool chooseLocationForPosts;
-  Percorsi({
-    super.key,
-    this.chooseLocationForPosts = false
-  });
+  Percorsi({super.key, this.chooseLocationForPosts = false});
   @override
   State<Percorsi> createState() => PercorsiState();
 }
@@ -28,7 +25,7 @@ class PercorsiState extends State<Percorsi> {
     'Ciclabile - Panoramico': Icons.directions,
     'Enogastronomico': Icons.local_bar,
     'Storico-Culturale': Icons.account_balance,
-    'Sci': Icons.ac_unit
+    'Sci ': Icons.ac_unit
   };
 
   List<String> categories = [
@@ -37,7 +34,7 @@ class PercorsiState extends State<Percorsi> {
     'Ciclabile - Panoramico',
     'Enogastronomico',
     'Storico-Culturale',
-    'Sci'
+    'Sci '
   ];
 
   @override
@@ -139,14 +136,13 @@ class PercorsiState extends State<Percorsi> {
       itemCount: filteredTrails.length,
       itemBuilder: (context, index) {
         return PercorsoTile(
-          title: filteredTrails[index].title,
-          category: filteredTrails[index].category,
-          startpoint: filteredTrails[index].startpoint,
-          imageName: filteredTrails[index].imageName,
-          onTap: () => widget.chooseLocationForPosts ? 
-            context.pop(filteredTrails[index].title) :
-            context.push('/percorso', extra: filteredTrails[index])
-        );
+            title: filteredTrails[index].title,
+            category: filteredTrails[index].category,
+            startpoint: filteredTrails[index].startpoint,
+            imageName: filteredTrails[index].imageName,
+            onTap: () => widget.chooseLocationForPosts
+                ? context.pop(filteredTrails[index].title)
+                : context.push('/percorso', extra: filteredTrails[index]));
       },
     );
   }

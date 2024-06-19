@@ -6,8 +6,7 @@ import 'constants.dart';
 class ApiManager {
   static String _baseUrl = 'http://$myIP:8000/api';
 
-  static Future<String?> getToken() async 
-  {
+  static Future<String?> getToken() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.getString("access_token");
   }
@@ -29,8 +28,7 @@ class ApiManager {
   }
 
   static Future<String?> postData(
-      String endpoint, Map<String, dynamic> data) async 
-  {
+      String endpoint, Map<String, dynamic> data) async {
     String? token = await getToken();
     final response = await http.post(
       Uri.parse('$_baseUrl/$endpoint'),
@@ -43,29 +41,7 @@ class ApiManager {
 
     if (response.statusCode == 200) {
       // Se la risposta è 200 (OK), decodifica il JSON e restituisci i dati
-      return response.body;//json.decode(response.body);
-    } else {
-      // Se la risposta non è 200, gestisci l'errore come preferisci
-      print('Errore nella richiesta API: ${response.statusCode}');
-      return null;
-    }
-  }
-
-  static Future<void> deleteData(
-      String endpoint, Map<String, dynamic> data) async {
-    String? token = await getToken();
-    final response = await http.delete(
-      Uri.parse('$_baseUrl/$endpoint'),
-      body: json.encode(data),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
-    );
-
-    if (response.statusCode == 200) {
-      // Se la risposta è 200 (OK), decodifica il JSON e restituisci i dati
-      return json.decode(response.body);
+      return response.body; //json.decode(response.body);
     } else {
       // Se la risposta non è 200, gestisci l'errore come preferisci
       print('Errore nella richiesta API: ${response.statusCode}');

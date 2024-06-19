@@ -265,8 +265,8 @@ class _MapPageState extends State<MapPage> {
         zoom: 10,
         center: Point(
           coordinates: Position(
-            12.244007095329533,
-            45.66746798861351,
+            12.144494,
+            45.977278,
           ),
         ),
       );
@@ -300,8 +300,8 @@ class _MapPageState extends State<MapPage> {
             'type': 'Feature',
             'geometry': Point(
               coordinates: Position(
-                trail.coords!.x,
                 trail.coords!.y,
+                trail.coords!.x,
               ),
             ).toJson(),
             'properties': trail.toJson(),
