@@ -7,6 +7,7 @@ class Post:
         self.date = post[4]
         self.like = post[5]
         self.comments = post[6]
+        #self.likers = post[7]
 
     def to_dict(self):
         return {

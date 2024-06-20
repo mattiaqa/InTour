@@ -1,4 +1,4 @@
-FROM python:3.12-alpine
+FROM python:3.10-alpine
 
 ENV FLASK_APP="/src/backend/app"
 ENV FLASK_RUN_HOST=0.0.0.0
@@ -12,19 +12,19 @@ RUN apk add --no-cache --update \
     libxml2 libxml2-dev \
     libxslt libxslt-dev \
     libjpeg-turbo-dev zlib-dev \
-    libmagic
+    libmagic \
+    cmake 
 
 RUN python3 -m pip install --upgrade pip
 
 ADD requirements.txt .
 RUN  python3 -m pip install -r requirements.txt
-RUN  python3 -m spacy download it_core_news_lg
 
 EXPOSE 5000
 
 WORKDIR /src
 
-ADD datasets/sentieri-storico-culturali.xls /assets/datasets/
+ADD datasets/ /assets/datasets/
 
 COPY backend/ .
 

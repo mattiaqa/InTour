@@ -1,12 +1,11 @@
 import os 
 from datetime import datetime
 from app.api import bp 
-from flask import jsonify, request, current_app, send_from_directory
+from flask import jsonify, request, current_app, send_file
 from flask_jwt_extended import *
 from app.extension import mongo
-from app.utils import get_all_friends, isFriendOf, allowed_file
+from app.utils import get_all_friends, isFriendOf
 from bson import ObjectId
-import magic 
 
 @bp.route('/post/upload', methods=['POST'])
 @jwt_required()
@@ -30,22 +29,16 @@ def upload_posts():
 
     try:
         if 'file' not in request.files:
-            return jsonify({'error': 'No file found'}), 400
+            return jsonify({'Error': 'Nessun file trovato!'}), 400
 
-        # check if name file is void
+        # check if filename is void
         uploaded_file = request.files['file']
         if uploaded_file.filename == '':
-            return jsonify({'error': 'Void name file'}), 400
+            return jsonify({'Error': 'Il nome del file non può essere vuoto!'}), 400
 
         # check extension
-        if not allowed_file(uploaded_file.filename):
-            return jsonify({'error': 'Invalid file type. Only .png and .jpg allowed'}), 400
-
-        # check MIME type
-        mime = magic.Magic(mime=True)
-        file_mime = mime.from_buffer(uploaded_file.stream.read(2048))
-        if file_mime not in ['image/jpeg', 'image/png']:
-            return jsonify({'error': 'Invalid MIME type. Only JPEG and PNG allowed'}), 400
+        #if not allowed_file(uploaded_file.):
+        #    return jsonify({'error': 'Invalid file type. Only .png and .jpg allowed'}), 400
 
         user = get_jwt_identity()['username']
         description = request.form.get('description')
@@ -53,27 +46,29 @@ def upload_posts():
         # create a new ObjectId to use in mongodb
         object_id = ObjectId()
 
-        # use of the ObjectId as the file name
-        file_name = str(object_id) + '.jpg'
-
         # if current user' directory does not exists, create new one
-        upload_folder = f'uploads/{user}'
+        upload_folder = f'/src/backend/static/uploads/{user}'
         if not os.path.exists(upload_folder):
             os.makedirs(upload_folder)
         
-        upload_url = f'{upload_folder}/{file_name}'
+        upload_url = f'{upload_folder}/{uploaded_file.filename}'
         uploaded_file.save(upload_url)
+        uploaded_url_renamed = f'{upload_folder}/{object_id}'
+
+        os.rename(upload_url, uploaded_url_renamed)
 
         # calculate the current date
         current_date = datetime.now().date()
 
+        img_url = f'/uploads/{user}/{object_id}'
+
         new_post = {
             "_id" : object_id,
             "creator" : user,
-            "img_url" : upload_url,
+            "img_url" : img_url,
             "description" : description,
             "date" : str(current_date), 
-            "like" : 0,
+            "like" : [],
             "comments" : []
         }
 
@@ -108,20 +103,16 @@ def delete_posts():
         post_id = request.json.get('post_id')
         user = get_jwt_identity()['username']
         
-        # Check if the post_id is a valid ObjectId
-        if not ObjectId.is_valid(post_id):
-            return jsonify({"Error": "Invalid post_id format"}), 400
-        
         query = {"_id": ObjectId(post_id)}
         result = mongo["posts"].delete_one(query)
         
         # Check if the post was found and deleted
         if result.deleted_count == 1:
             # remove the image from uploads folder
-            os.remove(f"uploads/{user}/{post_id}.jpg")
+            os.remove(f"/src/backend/static/uploads/{user}/{post_id}")
             return jsonify({"Status": "Success"}), 200
         else:
-            return jsonify({"Error": "Post not found"}), 404
+            return jsonify({"Error": "Nessun post trovato!"}), 404
 
     except Exception as e:
         current_app.logger.error("Internal Server Error: %s", e)
@@ -148,18 +139,73 @@ def fetch_friend_posts():
 
         #TODO: add dynamic post loading
         for friend in friends_list:
-            friend_posts = mongo['posts'].find({'creator' : friend}).limit(10).sort('date')
+            friend_posts = mongo['posts'].find({'creator' : friend})
 
             for post in friend_posts:
                 post['_id'] = str(post['_id'])
                 result.append(post)
-            
+        
+        result.sort(key=lambda x: x['date'])
+
         return jsonify(result), 200
 
     except Exception as e:
         current_app.logger.error("Internal Server Error: %s", e)
         return jsonify({"error": "something went wrong"}), 500
     
+@bp.route('/post/comment/delete', methods=['POST'])
+@jwt_required()
+def remove_comment_post():
+    """
+        Remove a comment's post
+
+        Parameters:
+        - post_id: id of the post.
+        - comment: text of the comment to be removed
+
+        Returns:
+        - If successful, returns a JSON response with a status of success
+          and an HTTP status code of 200.
+        - If the requests is not valid, return an HTTP status code of 400.
+        - If the post is not found, return an HTTP status code of 404.
+        - If any exceptions occur during the process, 
+          logs an internal server error and returns a JSON response with 
+          an error message ({'Error': 'Internal Server Error'}) 
+          and an HTTP status code of 500.
+    """
+    try:
+        user = get_jwt_identity()
+        post_id = request.json['post_id']
+        comment_id = request.json['commentId']
+
+        if not post_id or not comment_id:
+            return jsonify({"Error":"Missing Parameters"}), 400
+        
+        post = mongo['posts'].find_one({'_id' : ObjectId(post_id)})
+
+        if not post:
+            return jsonify({"Error":"Nessun post trovato!"}), 404
+        
+        comments = post.get('comments', [])
+
+        index_to_delete = None
+        for i, comment in enumerate(comments):
+            if comment.get('user') == user['username'] and comment.get('commentId') == comment_id:
+                index_to_delete = i
+                break
+
+        if index_to_delete is not None:
+            del comments[index_to_delete]
+            mongo['posts'].update_one({'_id': ObjectId(post_id)}, {'$set': {'comments': comments}})
+
+            return jsonify({"Status":"Success"}), 200
+
+        return jsonify({"Error":"Commento non trovato!"}), 404
+    except Exception as e:
+        current_app.logger.error("Internal Server Error: %s", e)
+        return jsonify({"error": "something went wrong"}), 500
+
+
 @bp.route('/post/comment', methods=['POST'])
 @jwt_required()
 def add_comment_to_post():
@@ -191,13 +237,16 @@ def add_comment_to_post():
         post = mongo['posts'].find_one({'_id' : ObjectId(post_id)})
 
         if not post:
-            return jsonify({"Error":"Post not found"}), 404
+            return jsonify({"Error":"Nessun post trovato!"}), 404
         
         # if the current user is not friend of the post's creator, denies access
-        if not isFriendOf(post['creator'], user['username']):
-            return jsonify({"Error":"Unathorized"}), 403
-        
+        if user == post['creator'] and not isFriendOf(post['creator'], user['username']):
+            return jsonify({"Error":"Unauthorized"}), 403
+
+        commentId = str(ObjectId())
+
         comment = {
+            'commentId' : commentId,
             'user' : user['username'],
             'comment': comment_text,
             'comment_date': datetime.now().strftime("%Y-%m-%d")
@@ -208,66 +257,12 @@ def add_comment_to_post():
             {'$push': {'comments': comment}}
         )
 
-        return jsonify({"Status":"Success"}), 200
+        return jsonify({"CommentId" : commentId}), 200
 
     except Exception as e:
         current_app.logger.error("Internal Server Error: %s", e)
         return jsonify({"error": "something went wrong"}), 500
 
-
-@bp.route('/post/comment', methods=['DELETE'])
-@jwt_required()
-def remove_comment_post():
-    """
-        Remove a comment's post
-
-        Parameters:
-        - post_id: id of the post.
-        - comment: text of the comment to be removed
-
-        Returns:
-        - If successful, returns a JSON response with a status of success
-          and an HTTP status code of 200.
-        - If the requests is not valid, return an HTTP status code of 400.
-        - If the post is not found, return an HTTP status code of 404.
-        - If any exceptions occur during the process, 
-          logs an internal server error and returns a JSON response with 
-          an error message ({'Error': 'Internal Server Error'}) 
-          and an HTTP status code of 500.
-    """
-    try:
-        user = get_jwt_identity()
-        post_id = request.json['post_id']
-        comment_text = request.json['comment']
-
-        if not post_id or not comment_text:
-            return jsonify({"Error":"Missing Parameters"}), 400
-        
-        post = mongo['posts'].find_one({'_id' : ObjectId(post_id)})
-
-        if not post:
-            return jsonify({"Error":"Post not found"}), 404
-        
-        comments = post.get('comments', [])
-
-        # Find the index of the comment that matches the user and comment_text
-        index_to_delete = None
-        for i, comment in enumerate(comments):
-            if comment.get('user') == user['username'] and comment.get('comment') == comment_text:
-                index_to_delete = i
-                break
-
-        if index_to_delete is not None:
-            del comments[index_to_delete]
-            # Update the post with the modified comments list
-            mongo['posts'].update_one({'_id': ObjectId(post_id)}, {'$set': {'comments': comments}})
-
-            return jsonify({"Status":"Success"}), 200
-
-        return jsonify({"Error":"Comment not found"}), 404
-    except Exception as e:
-        current_app.logger.error("Internal Server Error: %s", e)
-        return jsonify({"error": "something went wrong"}), 500 
 
 @bp.route('/post/like', methods=['POST'])
 @jwt_required()
@@ -298,7 +293,7 @@ def like_post():
         post = mongo['posts'].find_one({'_id' : ObjectId(post_id)})
 
         if not post:
-            return jsonify({"Error":"Post not found"}), 404
+            return jsonify({"Error":"Nessun post trovato!"}), 404
         
         # if the current user is not friend of the post's creator, denies access
         if not isFriendOf(post['creator'], user['username']):
@@ -306,7 +301,7 @@ def like_post():
     
         mongo['posts'].update_one(
             {'_id': ObjectId(post_id)},
-            {'$inc': {'like': 1}}
+            {'$push': {'like': user['username']}}
         )
 
         return jsonify({"Status":"Success"}), 200
@@ -344,7 +339,7 @@ def dislike_post():
         post = mongo['posts'].find_one({'_id' : ObjectId(post_id)})
 
         if not post:
-            return jsonify({"Error":"Post not found"}), 404
+            return jsonify({"Error":"Nessun post trovato!"}), 404
         
         # if the current user is not friend of the post's creator, denies access
         if not isFriendOf(post['creator'], user['username']):
@@ -352,7 +347,7 @@ def dislike_post():
     
         mongo['posts'].update_one(
             {'_id': ObjectId(post_id)},
-            {'$inc': {'like': -1}}
+            {'$pull': {'like': user['username']}}
         )
 
         return jsonify({"Status":"Success"}), 200
@@ -363,7 +358,7 @@ def dislike_post():
     
 
 @bp.route('/uploads/<username>/<filename>')
-@jwt_required()
+#@jwt_required()
 def get_post_image(username, filename):
     """
         Give access to user's uploads
@@ -378,17 +373,16 @@ def get_post_image(username, filename):
           and an HTTP status code of 500.
     """
     try:
-        user = get_jwt_identity()['username']
+        #user = get_jwt_identity()['username']
 
-        # if the user doesn't owns the folder, access is denied
-        if(user != username):
-            return jsonify({"Error":"Unauthorized"}), 403
+        #if(not isFriendOf(username, user)):
+        #    return jsonify({"Error":"Unauthorized"}), 403
 
         # prevent path traversal
-        path = f'{username}/{filename}'
-        sanitezed_path = os.path.normpath(path)
+        path = f'/src/backend/static/uploads/{username}/{filename}'
+        #sanitezed_path = os.path.normpath(path)
 
-        return send_from_directory('uploads/', sanitezed_path), 200
+        return send_file(path, mimetype='image/jpeg'), 200
     except Exception as e:
         current_app.logger.error("Internal Server Error: %s", e)
         return jsonify({"error": "something went wrong"}), 500

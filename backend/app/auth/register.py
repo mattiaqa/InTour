@@ -1,6 +1,5 @@
 import bcrypt
 from pymongo.errors import DuplicateKeyError
-import re
 from app.auth import bp 
 from flask import jsonify, request, current_app
 from app.extension import mongo
@@ -15,9 +14,6 @@ def register():
         birthdate = request.json['birthdate']
         password = request.json['password'].encode('utf-8')
 
-        if re.search(r'\.\./|/\./|//', username):
-            return jsonify({"Error": "Invalid username"}), 400
-
         salt = bcrypt.gensalt()
         password = bcrypt.hashpw(password, salt)
 
@@ -28,14 +24,18 @@ def register():
             "email": email,
             "password": password,
             "birthdate": birthdate,
-            "friends" : []
+            "profile_image_url": "",
+            "description":"",
+            "friends" : [],
+            "friends_request": [],
+            "friends_pending":[]
         }
 
         mongo["users"].insert_one(newUser)
-        return jsonify({"Status":"Done"}), 200
+        return jsonify({"Status":"Success"}), 200
     
     except DuplicateKeyError:
-        return jsonify({"Error":"Username already taken"}), 403
+        return jsonify({"Error":"Lo username non è disponibile!"}), 204
     except Exception as e:
         current_app.logger.error("Internal Server Error: %s", e)
         return jsonify({"Error":"Internal Server Error"})

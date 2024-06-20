@@ -25,9 +25,9 @@ def login():
                 ret = {'access_token' : create_access_token(identity=identity)}
 
                 return jsonify(ret), 200
-            return jsonify({"Error":"Wrong credentials"}), 403
+            return jsonify({"Error":"Email o Password errati"}), 403
 
-        return jsonify({"Error":"User doesn't exist"}), 404
+        return jsonify({"Error":"Email o Password errati"}), 403
     except Exception as e:
         current_app.logger.error("Internal Server Error: %s", e)
         return jsonify({"Error":"Internal Server Error"}), 500

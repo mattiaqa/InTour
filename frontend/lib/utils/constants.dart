@@ -1,3 +1,1 @@
-import 'package:flutter/material.dart';
-
-String myIP = "192.168.1.22";
+String myIP = "161.35.21.216";

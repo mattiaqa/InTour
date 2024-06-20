@@ -21,15 +21,16 @@ class ProfileDataAdapter extends TypeAdapter<Profile_Data> {
       birthdate: fields[1] as String?,
       email: fields[2] as String?,
       name: fields[3] as String?,
-      surname: fields[4] as String?,
       friends: (fields[5] as List?)?.cast<String>(),
+      friends_request: (fields[6] as List?)?.cast<String>(),
+      friends_pending: (fields[7] as List?)?.cast<String>(),
     );
   }
 
   @override
   void write(BinaryWriter writer, Profile_Data obj) {
     writer
-      ..writeByte(6)
+      ..writeByte(5)
       ..writeByte(0)
       ..write(obj.userid)
       ..writeByte(1)
@@ -38,9 +39,11 @@ class ProfileDataAdapter extends TypeAdapter<Profile_Data> {
       ..write(obj.email)
       ..writeByte(3)
       ..write(obj.name)
-      ..writeByte(4)
-      ..write(obj.surname)
       ..writeByte(5)
+      ..write(obj.friends)
+      ..writeByte(6)
+      ..write(obj.friends)
+      ..writeByte(7)
       ..write(obj.friends);
   }
 

@@ -1,0 +1,20 @@
+{
+  "id": "events-layer",
+  "type": "symbol",
+  "source": "events",
+  "layout": {
+    "icon-image": "event_marker",
+    "icon-size": 0.25,
+    "icon-anchor": "bottom"
+  },
+  "filter": [
+    "all",
+    [
+      "!",
+      [
+        "has",
+        "point_count"
+      ]
+    ]
+  ]
+}

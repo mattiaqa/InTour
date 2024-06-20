@@ -2,7 +2,8 @@ from app.api import bp
 from flask import jsonify, current_app, request
 from flask_jwt_extended import *
 from app.extension import trails
-from app.utils import extract_preferences
+from app.extension import mongo
+import pandas as pd 
 
 @bp.route('/trails', methods=['GET'])
 @jwt_required()
@@ -26,13 +27,3 @@ def get_all_path():
         current_app.logger.error("Internal Server Error: %s", e)
         return jsonify({"Error": "Internal Server Error"}), 500
     
-  
-@bp.route('/trails/recommends', methods=['GET'])
-@jwt_required()
-def reccomends_trails():
-    user = get_jwt_identity()['username']
-    user_input_text = request.json['user_input_text']
-
-    user_preferences = extract_preferences(user_input_text)
-
-    return jsonify(user_preferences), 200
