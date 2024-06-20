@@ -53,7 +53,8 @@ class BachecaTileState extends State<BachecaTile>
   @override
   Widget build(BuildContext context) 
   {
-    return Card
+    return SingleChildScrollView(
+    child:Card
     (
       elevation: 0,
       margin: EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 2.0),
@@ -203,6 +204,7 @@ class BachecaTileState extends State<BachecaTile>
           Divider(height: 20, thickness: 0.4)
         ],
       )
+    )
     );
   }
 

@@ -49,7 +49,7 @@ class FriendRequestButtonState extends State<FirendRequestButton> {
     return SizedBox
     (
       height: (status == FriendshipState.requestRecieved) ? 65 : 30,
-      width: 200,
+      //width: 200,
       child: 
         (status == FriendshipState.sameUser) ? 
           ElevatedButton(

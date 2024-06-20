@@ -28,6 +28,25 @@ class SharePreviewPageState extends State<SharePreviewPage> {
   TextEditingController descriptionController = TextEditingController();
   TextEditingController locationController = TextEditingController();
   
+  late bool postable;
+  late Widget shareStatus;
+  Widget shareStatus_loading = SizedBox(
+    width: 20,
+    height: 20,
+    child: CircularProgressIndicator(),
+  );
+  Widget shareStatus_clickable = Text(
+    'Pubblica',
+    style: TextStyle(fontSize: 16),
+  );
+
+  @override
+  void initState() {
+    shareStatus = shareStatus_clickable;
+    postable = true;
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -92,18 +111,22 @@ class SharePreviewPageState extends State<SharePreviewPage> {
                           padding: EdgeInsets.symmetric(vertical: 15),
                           //foregroundColor: Colors.green,
                         ),
-                        child: Text(
-                          'Pubblica',
-                          style: TextStyle(fontSize: 16),
-                        ),
+                        child: shareStatus,
                         onPressed: () {
-                          uploadImage(widget.image, descriptionController.text, locationController.text)
-                            .then((value){
-                              if (value){
-                                context.go('/userprofile', extra: AppService.instance.currentUser!.userid);
-                                ShowBottomMessage(context, 'Post pubblicato con successo');
-                              }
+                          setState(() {
+                            postable = false;
+                            shareStatus = shareStatus_loading;
                           });
+                          if(postable)
+                          {
+                            uploadImage(widget.image, descriptionController.text, locationController.text)
+                              .then((value){
+                                if (value){
+                                  context.go('/userprofile', extra: AppService.instance.currentUser!.userid);
+                                  ShowBottomMessage(context, 'Post pubblicato con successo');
+                                }
+                            });
+                          }
                         },
                       ),
                     ),
