@@ -179,7 +179,7 @@ class FriendRequestButtonState extends State<FirendRequestButton> {
       case FriendshipState.requestRecieved:
         return "Accetta amicizia";
       case FriendshipState.requestSent:
-        return "Richiesta iniviata";
+        return "Richiesta inviata";
       case FriendshipState.strangers:
         return "Aggiungi amico";
       default:
