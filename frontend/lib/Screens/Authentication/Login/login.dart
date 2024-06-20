@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:frontend/Screens/Common/bottomMessage.dart';
 import 'package:frontend/profile_data.dart';
 import 'package:frontend/utils/api_manager.dart';
 import 'package:frontend/utils/app_service.dart';
@@ -17,8 +18,25 @@ class LoginPageState extends State<LoginPage> {
   TextEditingController userController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
 
-  Widget LoginButton = Text('Login');
+  Widget LoadingState = SizedBox(
+    width: 20,
+    height: 20,
+    child: CircularProgressIndicator(),
+  );
+  Widget ClickableState = SizedBox(
+    width: 40,
+    height: 20,
+    child: Text('Login'),
+  );
+  late Widget LoginButton;
+
   bool _obscurePassword = true;
+
+  @override
+  void initState() {
+    LoginButton = ClickableState;
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -126,47 +144,43 @@ class LoginPageState extends State<LoginPage> {
   }
 
   void tryLogin(BuildContext context) {
+    if(userController.text.trim().isEmpty || passwordController.text.trim().isEmpty)
+    {
+      return ShowBottomErrorMessage(context, 'Inserisci username e password');
+    }
     setState(() {
-      LoginButton = CircularProgressIndicator();
+      LoginButton = LoadingState;
     });
-    AuthService.login(
-            userController.text.toString(), passwordController.text.toString())
-        .then((value) {
-      if (value == 200) {
-        _fetchUser(userController.text).then((user) {
-          if (user != null) {
-            AppService.instance.setUserData(user);
-            context.go('/home');
-          } else {
-            // Gestione errore utente non trovato
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Utente non trovato')),
-            );
-            setState(() {
-              LoginButton = Text('Login');
-            });
-          }
-        });
-      } else if (value == 403) {
-        // Gestione errore login fallito
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Email o password errati')),
-        );
-        setState(() {
-          LoginButton = Text('Login');
-        });
-        passwordController.clear();
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: Text(
-                  'Il server non è al momento ragiungibile, ci scusiamo per il disagio.')),
-        );
-        setState(() {
-          LoginButton = Text('Login');
-        });
+    AuthService.login(userController.text.trim(), passwordController.text.trim()).then(
+      (value) 
+      {
+        if (value == 200) {
+          _fetchUser(userController.text).then((user) {
+            if (user != null) {
+              AppService.instance.setUserData(user);
+              context.go('/home');
+            } else {
+              ShowBottomErrorMessage(context, 'Utente non trovato');
+              setState(() {
+                LoginButton = ClickableState;
+              });
+            }
+          });
+        } else if (value == 403) {
+          ShowBottomErrorMessage(context, 'Email o password errati');
+          setState(() {
+            LoginButton = ClickableState;
+          });
+          passwordController.clear();
+        } else {
+          ShowBottomErrorMessage(context, 'Il server non è al momento ragiungibile, ci scusiamo per il disagio');
+          
+          setState(() {
+            LoginButton = ClickableState;
+          });
+        }
       }
-    });
+    );
   }
 }
 

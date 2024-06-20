@@ -9,7 +9,7 @@ def logout():
     try:
         jti = get_jwt()['jti']
         token_blacklist.append(jti)
-        return jsonify({"Status":"Logged out"}), 200
+        return jsonify({"Status":"Logout eseguito correttamente"}), 200
     except Exception as e:
         current_app.logger.error("Internal Server Error: %s", e)
         return jsonify({"Error":"Internal Server Error"}), 500

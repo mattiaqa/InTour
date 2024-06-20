@@ -48,7 +48,7 @@ def get_user_profile_image(username):
         user_data = mongo['users'].find_one({'_id': username}, {'password': 0})
 
         if not user_data:
-            return jsonify({"Error":"No data found"}), 404
+            return jsonify({"Error":"Nessun dato trovato"}), 404
 
         return jsonify({"profile_image_url":user_data['profile_image_url']}), 200
     except Exception as e:
@@ -119,7 +119,7 @@ def edit_profile_description():
         current_app.logger.info("%s", user)
         current_app.logger.info("%s", new_description)
 
-        return jsonify({"message": "Description updated successfully"}), 200
+        return jsonify({"message": "Descrizione aggiornata correttamente!"}), 200
     except Exception as e:
         current_app.logger.error("Internal Server Error: %s", e)
         return jsonify({"Error": "Internal Server Error"}), 500

@@ -2,6 +2,8 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/Screens/Common/appbar.dart';
+import 'package:frontend/Screens/Common/bottomMessage.dart';
+import 'package:frontend/utils/app_service.dart';
 import 'package:go_router/go_router.dart';
 import 'package:frontend/utils/constants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -91,13 +93,16 @@ class SharePreviewPageState extends State<SharePreviewPage> {
                           //foregroundColor: Colors.green,
                         ),
                         child: Text(
-                          'OK',
+                          'Pubblica',
                           style: TextStyle(fontSize: 16),
                         ),
                         onPressed: () {
                           uploadImage(widget.image, descriptionController.text, locationController.text)
-                              .then((value) {
-                            if (value) context.go('/sharesuccess');
+                            .then((value){
+                              if (value){
+                                context.go('/userprofile', extra: AppService.instance.currentUser!.userid);
+                                ShowBottomMessage(context, 'Post pubblicato con successo');
+                              }
                           });
                         },
                       ),
@@ -110,7 +115,7 @@ class SharePreviewPageState extends State<SharePreviewPage> {
                           foregroundColor: const Color.fromARGB(255, 214, 102, 94),
                         ),
                         child: Text(
-                          'SCARTA',
+                          'Scarta',
                           style: TextStyle(fontSize: 16),
                         ),
                         onPressed: () {
@@ -132,10 +137,10 @@ class SharePreviewPageState extends State<SharePreviewPage> {
 }
 
 Future<String?> getToken() async 
-  {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.getString("access_token");
-  }
+{
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  return prefs.getString("access_token");
+}
 
 Future<bool> uploadImage(File selectedImage, String description, String position) async {
   String accessToken = await getToken() ?? "";

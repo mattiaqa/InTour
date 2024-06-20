@@ -1,5 +1,8 @@
+import 'dart:convert';
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:frontend/Screens/Common/bottomMessage.dart';
 import 'package:frontend/utils/auth_service.dart';
 import 'package:go_router/go_router.dart';
 
@@ -18,6 +21,7 @@ class RegisterPageState extends State<RegisterPage> {
 
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
+  bool _acceptPrivacyPolicy = false;
 
   bool _isValidEmail(String email) {
     final regex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
@@ -30,6 +34,7 @@ class RegisterPageState extends State<RegisterPage> {
 
   bool _isValidUsername(String username) {
     return username.length > 3 &&
+        !username.contains(' ') &&
         !username.contains('*') &&
         !username.contains("'") &&
         !username.contains('"') &&
@@ -45,34 +50,39 @@ class RegisterPageState extends State<RegisterPage> {
   }
 
   void tryRegister(BuildContext context) {
-    String email = emailController.text.toString();
-    String fullname = nameController.text.toString();
-    String username = userController.text.toString();
-    String password = passwordController.text.toString();
-    String confirmPassword = confirmPasswordController.text.toString();
+    String email = emailController.text.trim();
+    String fullname = nameController.text.trim();
+    String username = userController.text.trim();
+    String password = passwordController.text.trim();
+    String confirmPassword = confirmPasswordController.text.trim();
 
     if (!_isValidEmail(email)) {
-      _showError(context, "Email non valida!");
+      ShowBottomErrorMessage(context, "Email non valida");
       return;
     }
 
     if (!_isValidName(fullname)) {
-      _showError(context, "Il nome non deve superare i 32 caratteri!");
+      ShowBottomErrorMessage(context, "Il nome non deve superare i 32 caratteri");
       return;
     }
 
     if (!_isValidUsername(username)) {
-      _showError(context, "Lo username deve essere più lungo di 3 caratteri e non deve contenere caratteri speciali!");
+      ShowBottomErrorMessage(context, "Lo username deve essere più lungo di 3 caratteri e non deve contenere caratteri speciali");
       return;
     }
 
     if (!_isValidPassword(password)) {
-      _showError(context, "La password deve essere lunga almeno 8 caratteri!");
+      ShowBottomErrorMessage(context, "La password deve essere lunga almeno 8 caratteri");
       return;
     }
 
     if (password != confirmPassword) {
-      _showError(context, "Le password non coincidono!");
+      ShowBottomErrorMessage(context, "Le password non coincidono");
+      return;
+    }
+
+    if (!_acceptPrivacyPolicy) {
+      ShowBottomErrorMessage(context, "Devi accettare la politica sulla privacy per procedere");
       return;
     }
 
@@ -86,19 +96,18 @@ class RegisterPageState extends State<RegisterPage> {
       password,
     ).then((value) {
       if (value.valid) {
-        context.go('/success');
+        context.go('/login');
+        ShowBottomMessage(context, 'Registrato con successo! Ora esegui il login');
       } else {
-        _showError(context, value.body);
+        var errorDecoded = json.decode(value.body)['Error'];
+        if(errorDecoded == null)
+          ShowBottomErrorMessage(context, 'Si è verificato un errore, riprova più tardi');
+        else if(errorDecoded == 'Username already taken')
+          ShowBottomErrorMessage(context, 'Lo username scelto non è disponibile');
         passwordController.clear();
         confirmPasswordController.clear();
       }
     });
-  }
-
-  void _showError(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
-    );
   }
 
   @override
@@ -120,7 +129,7 @@ class RegisterPageState extends State<RegisterPage> {
                         height: 100,
                       ),
                     ),
-                    SizedBox(height: 20),
+                    SizedBox(height: 5),
                     Text(
                       "InTour",
                       textAlign: TextAlign.center,
@@ -129,7 +138,7 @@ class RegisterPageState extends State<RegisterPage> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    SizedBox(height: 50),
+                    SizedBox(height: 40),
                     TextField(
                       controller: emailController,
                       decoration: InputDecoration(
@@ -210,6 +219,39 @@ class RegisterPageState extends State<RegisterPage> {
                         ),
                         hintText: "Conferma Password",
                       ),
+                    ),
+                    SizedBox(height: 20),
+                    Row(
+                      children: [
+                        Checkbox(
+                          value: _acceptPrivacyPolicy,
+                          onChanged: (newValue) {
+                            setState(() {
+                              _acceptPrivacyPolicy = newValue!;
+                            });
+                          },
+                        ),
+                        Expanded(
+                          child: RichText(
+                            textAlign: TextAlign.center,
+                            text: TextSpan(
+                              children: [
+                                TextSpan(
+                                  text: "Ho letto e accetto la ",
+                                  style: TextStyle(color: Colors.black, fontSize: 14.0),
+                                ),
+                                TextSpan(
+                                  text: "politica sulla privacy",
+                                  style: TextStyle(color: Colors.blue, fontSize: 14.0),
+                                  recognizer: TapGestureRecognizer()
+                                    ..onTap = () =>
+                                        GoRouter.of(context).push("/privacy_policy"),
+                                ),
+                              ],
+                            ),
+                          ),
+                        )
+                      ],
                     ),
                     SizedBox(height: 30),
                     ElevatedButton(

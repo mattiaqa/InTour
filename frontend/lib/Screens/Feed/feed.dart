@@ -61,16 +61,19 @@ class BachecaState extends State<Bacheca>
           )
         ],
       ),
-      body: snapshot.data.isNotEmpty ? 
-        ListView.builder(
-          itemCount: snapshot.data.length,
-          itemBuilder: (context, index) => snapshot.data[index]
-        )
-        :
-        EmptyState(
-          icon: Icons.landscape_rounded,
-          message: 'Ancora nessun post',
-        )
+      body: RefreshIndicator(
+        onRefresh: _onRefresh,
+        child: snapshot.data.isNotEmpty ? 
+          ListView.builder(
+            itemCount: snapshot.data.length,
+            itemBuilder: (context, index) => snapshot.data[index]
+          )
+          :
+          EmptyState(
+            icon: Icons.landscape_rounded,
+            message: 'Ancora nessun post',
+          )
+      )
     );
   }
 
@@ -100,6 +103,10 @@ class BachecaState extends State<Bacheca>
       );
     }
     return result.reversed.toList();
+  }
+
+  Future<void> _onRefresh() async{
+    setState((){});
   }
 
 }

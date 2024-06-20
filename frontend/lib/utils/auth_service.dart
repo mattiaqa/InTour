@@ -86,4 +86,24 @@ class AuthService {
     }
     return false;
   }
+
+  static Future<bool> deleteAccount() async {
+    try {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final String? accessToken = prefs.getString("access_token");
+      final response = await http.post(
+        Uri.parse('http://$myIP:8000/auth/delete'),
+        headers: {"Authorization": 'Bearer $accessToken'},
+      );
+
+      if (response.statusCode == 200) {
+        await prefs.remove("access_token");
+        AppService.instance.manageAutoLogout();
+        return true;
+      }
+    } catch (e) {
+      print('Errore durante il logout: $e');
+    }
+    return false;
+  }
 }

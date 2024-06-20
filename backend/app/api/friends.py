@@ -37,10 +37,10 @@ def add_friends_request():
         )
 
         if(not friend):
-            return jsonify({"Error": "User not found"}), 404
+            return jsonify({"Error": "Utente non trovato!"}), 404
 
         if(isFriendOf(user, friend_to_add)):
-            return jsonify({"Error": "User is already your friend!"}), 204
+            return jsonify({"Error": "L'utente è già nella lista dei tuoi amici!"}), 204
 
         # update the friends list for both of these two users
         mongo['users'].update_one(
@@ -87,7 +87,7 @@ def add_friends():
         )
 
         if(not friend):
-            return jsonify({"Error": "User not found"}), 404
+            return jsonify({"Error": "Utente non trovato!"}), 404
 
         user = mongo['users'].find_one(
             {'_id':current_user}
@@ -157,7 +157,7 @@ def add_friends_request_reject():
         )
 
         if(not friend):
-            return jsonify({"Error": "User not found"}), 404
+            return jsonify({"Error": "Utente non trovato!"}), 404
 
         # update the friends list for both of these two users
         mongo['users'].update_one(
@@ -205,7 +205,7 @@ def remove_friends():
         )
 
         if(not friend):
-            return jsonify({"Error": "User not found"}), 404
+            return jsonify({"Error": "Utente non trovato!"}), 404
 
         # update the friends list for both of these two users
         mongo['users'].update_one(
@@ -256,7 +256,7 @@ def add_friends_undo_request():
         )
 
         if(not friend):
-            return jsonify({"Error": "User not found"}), 404
+            return jsonify({"Error": "Utente non trovato!"}), 404
 
         # update the friends list for both of these two users
         mongo['users'].update_one(

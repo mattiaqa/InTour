@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/Screens/Common/bottomMenu.dart';
+import 'package:frontend/Screens/Common/bottomMessage.dart';
 import 'package:frontend/utils/api_manager.dart';
 import 'package:frontend/utils/app_service.dart';
 import 'package:frontend/utils/auth_service.dart';
@@ -65,6 +66,7 @@ class FriendRequestButtonState extends State<FirendRequestButton> {
                     action: () {
                       AuthService.logout();
                       context.go('/login');
+                      ShowBottomMessage(context, 'Ti sei disconnesso');
                     }
                   ),
 
@@ -86,7 +88,11 @@ class FriendRequestButtonState extends State<FirendRequestButton> {
                   child: ElevatedButton(
                     onPressed: () {
                       ApiManager.postData('friends/accept', {'username': widget.username})
-                        .then((value) => widget.onTap());
+                        .then((value){
+                          widget.onTap();
+                          ShowBottomMessage(context, 'Hai un nuovo amico!');
+                        }
+                        );
                     },
                     child: Text('Accetta amicizia')
                   ),
@@ -100,7 +106,11 @@ class FriendRequestButtonState extends State<FirendRequestButton> {
                   child: ElevatedButton(
                     onPressed: () {
                       ApiManager.postData('friends/reject', {'username': widget.username})
-                        .then((value) => widget.onTap());
+                        .then((value){
+                          widget.onTap();
+                          ShowBottomMessage(context, 'Richiesta rifiutata');
+                        }
+                      );
                     },
                     child: Text('Rifiuta')
                   ),
@@ -116,16 +126,25 @@ class FriendRequestButtonState extends State<FirendRequestButton> {
 
                 if (status == FriendshipState.friends) {
                   ApiManager.postData('friends/remove', frienddata)
-                    .then((value) => widget.onTap());
+                    .then((value){
+                      widget.onTap();
+                      ShowBottomMessage(context, 'La vostra amicizia termina qui');
+                    });
                 }
                 else if (status == FriendshipState.requestSent) {
                   ApiManager.postData('friends/undo_request', frienddata)
-                    .then((value) => widget.onTap());
+                    .then((value){
+                      widget.onTap();
+                      ShowBottomMessage(context, 'Richiesta annullata');
+                    });
                 } 
                 else if (status == FriendshipState.strangers)
                 {
                   ApiManager.postData('friends/request', frienddata)
-                    .then((value) => widget.onTap());
+                    .then((value){
+                      widget.onTap();
+                      ShowBottomMessage(context, 'Richiesta inviata');
+                    });
                 }
               },
               child: Text(buttonText(status))

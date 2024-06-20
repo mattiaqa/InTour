@@ -14,6 +14,8 @@ import 'package:frontend/Screens/Authentication/Register/success.dart';
 import 'package:frontend/Screens/Common/borders.dart';
 import 'package:frontend/Screens/Percorsi/percorsi.dart';
 import 'package:frontend/Screens/Profile/Components/friends.dart';
+import 'package:frontend/Screens/Profile/Info/info.dart';
+import 'package:frontend/Screens/Profile/Info/policy.dart';
 import 'package:frontend/Screens/Share/selected.dart';
 import 'package:frontend/Screens/Share/share.dart';
 import 'package:frontend/Screens/Share/success.dart';
@@ -81,6 +83,19 @@ var router =
         );
       }),
   GoRoute(
+    name: 'Info',
+    path: '/info',
+    builder: (context, state) => UserInfoPage(
+        username: (state.extra as List<dynamic>)[0],
+        registrationDate: (state.extra as List<dynamic>)[1],
+      ),
+  ),
+  GoRoute(
+    name: 'Privacy Policy',
+    path: '/privacy_policy',
+    builder: (context, state) => PrivacyPolicyPage()
+  ),
+  GoRoute(
     name: 'Share',
     path: '/share',
     builder: (context, state) => SharePage(),
@@ -115,7 +130,8 @@ String? _redirect(BuildContext context, GoRouterState state) {
   final isLoginRoute = state.matchedLocation == LoginPage.route;
 
   if (state.matchedLocation == '/register' ||
-      state.matchedLocation == '/success') return null;
+      state.matchedLocation == '/success' ||
+      state.matchedLocation == '/privacy_policy') return null;
 
   if (!isLoggedIn && !isLoginRoute) {
     return LoginPage.route;

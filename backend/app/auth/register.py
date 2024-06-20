@@ -32,10 +32,10 @@ def register():
         }
 
         mongo["users"].insert_one(newUser)
-        return jsonify({"Status":"Done"}), 200
+        return jsonify({"Status":"Success"}), 200
     
     except DuplicateKeyError:
-        return jsonify({"Error":"Username already taken"}), 403
+        return jsonify({"Error":"Lo username non è disponibile!"}), 204
     except Exception as e:
         current_app.logger.error("Internal Server Error: %s", e)
         return jsonify({"Error":"Internal Server Error"})

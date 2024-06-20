@@ -29,12 +29,12 @@ def upload_posts():
 
     try:
         if 'file' not in request.files:
-            return jsonify({'error': 'No file found'}), 400
+            return jsonify({'Error': 'Nessun file trovato!'}), 400
 
         # check if filename is void
         uploaded_file = request.files['file']
         if uploaded_file.filename == '':
-            return jsonify({'error': 'Void filename'}), 400
+            return jsonify({'Error': 'Il nome del file non può essere vuoto!'}), 400
 
         # check extension
         #if not allowed_file(uploaded_file.):
@@ -103,10 +103,6 @@ def delete_posts():
         post_id = request.json.get('post_id')
         user = get_jwt_identity()['username']
         
-        # Check if the post_id is a valid ObjectId
-        if not ObjectId.is_valid(post_id):
-            return jsonify({"Error": "Invalid post_id format"}), 400
-        
         query = {"_id": ObjectId(post_id)}
         result = mongo["posts"].delete_one(query)
         
@@ -116,7 +112,7 @@ def delete_posts():
             os.remove(f"/src/backend/static/uploads/{user}/{post_id}")
             return jsonify({"Status": "Success"}), 200
         else:
-            return jsonify({"Error": "Post not found"}), 404
+            return jsonify({"Error": "Nessun post trovato!"}), 404
 
     except Exception as e:
         current_app.logger.error("Internal Server Error: %s", e)
@@ -188,7 +184,7 @@ def remove_comment_post():
         post = mongo['posts'].find_one({'_id' : ObjectId(post_id)})
 
         if not post:
-            return jsonify({"Error":"Post not found"}), 404
+            return jsonify({"Error":"Nessun post trovato!"}), 404
         
         comments = post.get('comments', [])
 
@@ -204,7 +200,7 @@ def remove_comment_post():
 
             return jsonify({"Status":"Success"}), 200
 
-        return jsonify({"Error":"Comment not found"}), 404
+        return jsonify({"Error":"Commento non trovato!"}), 404
     except Exception as e:
         current_app.logger.error("Internal Server Error: %s", e)
         return jsonify({"error": "something went wrong"}), 500
@@ -241,14 +237,16 @@ def add_comment_to_post():
         post = mongo['posts'].find_one({'_id' : ObjectId(post_id)})
 
         if not post:
-            return jsonify({"Error":"Post not found"}), 404
+            return jsonify({"Error":"Nessun post trovato!"}), 404
         
         # if the current user is not friend of the post's creator, denies access
         if user == post['creator'] and not isFriendOf(post['creator'], user['username']):
-            return jsonify({"Error":"Unathorized"}), 403
+            return jsonify({"Error":"Unauthorized"}), 403
+
+        commentId = str(ObjectId())
 
         comment = {
-            'commentId' : str(ObjectId()),
+            'commentId' : commentId,
             'user' : user['username'],
             'comment': comment_text,
             'comment_date': datetime.now().strftime("%Y-%m-%d")
@@ -259,7 +257,7 @@ def add_comment_to_post():
             {'$push': {'comments': comment}}
         )
 
-        return jsonify({"Status":"Success"}), 200
+        return jsonify({"CommentId" : commentId}), 200
 
     except Exception as e:
         current_app.logger.error("Internal Server Error: %s", e)
@@ -295,7 +293,7 @@ def like_post():
         post = mongo['posts'].find_one({'_id' : ObjectId(post_id)})
 
         if not post:
-            return jsonify({"Error":"Post not found"}), 404
+            return jsonify({"Error":"Nessun post trovato!"}), 404
         
         # if the current user is not friend of the post's creator, denies access
         if not isFriendOf(post['creator'], user['username']):
@@ -341,7 +339,7 @@ def dislike_post():
         post = mongo['posts'].find_one({'_id' : ObjectId(post_id)})
 
         if not post:
-            return jsonify({"Error":"Post not found"}), 404
+            return jsonify({"Error":"Nessun post trovato!"}), 404
         
         # if the current user is not friend of the post's creator, denies access
         if not isFriendOf(post['creator'], user['username']):

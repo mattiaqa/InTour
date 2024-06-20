@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:frontend/Screens/Common/bottomMenu.dart';
+import 'package:frontend/Screens/Common/bottomMessage.dart';
 import 'package:frontend/Screens/Feed/Post/Components/like.dart';
 import 'package:frontend/Screens/Feed/Post/Components/user.dart';
 import 'package:frontend/utils/api_manager.dart';
@@ -107,7 +108,9 @@ class BachecaTileState extends State<BachecaTile>
                   Icons.comment_outlined,
                   size: 40,
                 ),
-                onTap: () => context.push('/comments', extra: [widget.id, widget.comments, widget.username])
+                onTap: () async {
+                  context.push('/comments', extra: [widget.id, widget.comments, widget.username]);
+                }
               ),
 
               // Spacer
@@ -130,7 +133,10 @@ class BachecaTileState extends State<BachecaTile>
                               'post_id': widget.id,
                             };
                             ApiManager.postData('post/delete', data).then(
-                              (value) => context.pop()
+                              (value){
+                                context.pop();
+                                ShowBottomMessage(context, 'Post eliminato');
+                              }
                             );
                           }
                         ),

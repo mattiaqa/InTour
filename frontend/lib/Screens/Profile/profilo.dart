@@ -5,6 +5,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/Screens/Common/appbar.dart';
 import 'package:frontend/Screens/Common/bottomMenu.dart';
+import 'package:frontend/Screens/Common/bottomMessage.dart';
 import 'package:frontend/Screens/Common/emptyState.dart';
 import 'package:frontend/Screens/Common/uploadPictures.dart';
 import 'package:frontend/Screens/Profile/Components/friendrequest.dart';
@@ -12,12 +13,9 @@ import 'package:frontend/Screens/Profile/Components/posts.dart';
 import 'package:frontend/Screens/Profile/Components/profiledata.dart';
 import 'package:frontend/Screens/Profile/Components/profilepic.dart';
 import 'package:frontend/utils/api_manager.dart';
-import 'package:frontend/utils/auth_service.dart';
 import 'package:go_router/go_router.dart';
 import 'package:frontend/utils/app_service.dart';
-import 'package:frontend/utils/constants.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 // ignore: must_be_immutable
 class ProfiloPage extends StatefulWidget {
@@ -86,7 +84,7 @@ class _ProfiloPage extends State<ProfiloPage> {
                   ),
                   SizedBox(height: 15),
                   ElevatedButton(
-                    child: Text("RIPROVA"),
+                    child: Text("Riprova"),
                     onPressed: () => setState((){})
                   )
                 ],
@@ -94,25 +92,24 @@ class _ProfiloPage extends State<ProfiloPage> {
             );
         
         Map<String,dynamic> userData = snapshot.data![0] as Map<String,dynamic>;
-        List<dynamic> userPosts = snapshot.data![1] as List<dynamic>;
+        List<dynamic> userPosts= snapshot.data![1] as List<dynamic>;
         String fullname = (userData['name'] ?? '') + ' ' + (userData['surname'] ?? '');
         
         return Scaffold(
           bottomSheet: isDescriptionTextFieldVisible ? _buildBottomSheet(context) : null,
           appBar: PageTitle(
             title: widget.username,
-            /*actions: [
+            actions: [
               Visibility(
                 visible: widget.username == AppService.instance.currentUser!.userid,
                 child: IconButton(
-                  icon: Icon(Icons.logout_rounded),
+                  icon: Icon(Icons.info_outline_rounded),
                   onPressed: () {
-                    AuthService.logout();
-                    context.go('/login');
+                    context.push('/info', extra: [widget.username, userData['birthdate']]);
                   },
                 )
               )
-            ],*/
+            ],
           ),
           body: SingleChildScrollView
           (
@@ -141,6 +138,7 @@ class _ProfiloPage extends State<ProfiloPage> {
                                   action: () => PictureUploader.pickImageForProfile(ImageSource.camera)
                                     .then((value) {
                                       setState((){});
+                                      ShowBottomMessage(context, 'Immagine del profilo aggiornata');
                                     })
                                 ),
 
@@ -150,17 +148,17 @@ class _ProfiloPage extends State<ProfiloPage> {
                                   action: () => PictureUploader.pickImageForProfile(ImageSource.gallery)
                                     .then((value) {
                                       setState((){});
+                                      ShowBottomMessage(context, 'Immagine del profilo aggiornata');
                                     })
                                 ),
 
-                                if( (userData['profile_image_url'] as String).isNotEmpty)
+                                if((userData['profile_image_url'] as String).isNotEmpty)
                                 BottomMenuButton(
                                   icon: Icons.highlight_remove_rounded, 
                                   text: "Rimuovi", 
                                   action: (){
                                     Future.delayed(Durations.short1).then(
                                       (value){
-                                      print('Adesso');
                                       ShowBottomMenu(context, 'Sei sicuro?', 
                                       [
                                         BottomMenuButton(
@@ -170,6 +168,7 @@ class _ProfiloPage extends State<ProfiloPage> {
                                             ApiManager.postData('profile/remove/image', {'username':widget.username})
                                               .then((value) {
                                               setState((){});
+                                              ShowBottomMessage(context, 'Immagine del profilo rimossa');
                                             });
                                           }
                                         ),
@@ -344,6 +343,4 @@ class _ProfiloPage extends State<ProfiloPage> {
       )
     );
   }
-
-
 }
