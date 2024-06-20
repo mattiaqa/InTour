@@ -254,6 +254,7 @@ class _ProfiloPage extends State<ProfiloPage> {
                   ),              
                   //const SizedBox(height: 50),
 
+                  //Divider(height: 4, thickness: 1,),
                   (userData['friends'] as List<dynamic>).contains(AppService.instance.currentUser!.userid) ||
                   widget.username == AppService.instance.currentUser!.userid ?
                     userPosts.isNotEmpty ?
