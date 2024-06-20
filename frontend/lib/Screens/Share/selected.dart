@@ -114,17 +114,21 @@ class SharePreviewPageState extends State<SharePreviewPage> {
                         child: shareStatus,
                         onPressed: () {
                           setState(() {
-                            postable = false;
                             shareStatus = shareStatus_loading;
                           });
                           if(postable)
                           {
+                            postable = false;
                             uploadImage(widget.image, descriptionController.text, locationController.text)
                               .then((value){
+                                context.go('/userprofile', extra: AppService.instance.currentUser!.userid);
                                 if (value){
-                                  context.go('/userprofile', extra: AppService.instance.currentUser!.userid);
                                   ShowBottomMessage(context, 'Post pubblicato con successo');
                                 }
+                                else{
+                                  ShowBottomErrorMessage(context, 'Errore durante il caricamento del post. Riprova più tardi');
+                                }
+                                postable = true;
                             });
                           }
                         },
